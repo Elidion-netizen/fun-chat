@@ -1,0 +1,3 @@
+cd fun-chat
+
+bunx --no -- commitlint --edit ${1}

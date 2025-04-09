@@ -1,0 +1,3 @@
+cd fun-chat
+
+bun run lint-staged
