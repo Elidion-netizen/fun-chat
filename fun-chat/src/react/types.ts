@@ -1,0 +1,68 @@
+export interface ComponentFunction {
+  (props: Record<string, unknown>): VirtualElement | string;
+}
+export type VirtualElementType = ComponentFunction | string;
+
+interface RefObject<T> {
+  current: T | null;
+}
+
+export interface VirtualElementProps {
+  [propName: string]: unknown;
+  ref?: RefObject<Element>;
+  children?: VirtualElement[];
+}
+export interface VirtualElement {
+  type: VirtualElementType;
+  props: VirtualElementProps;
+}
+
+export type FiberNodeDOM = Element | Text | null | undefined;
+export interface FiberNode<S = unknown, A = unknown, T = unknown>
+  extends VirtualElement {
+  alternate: FiberNode<S> | null;
+  dom?: FiberNodeDOM;
+  effectTag?: string;
+  child?: FiberNode;
+  return?: FiberNode;
+  sibling?: FiberNode;
+  hooks?: (StateHook<S> | EffectHook | ReducerHook<S, A>)[];
+  context: Map<number, T>;
+}
+
+export type StateHook<S> = {
+  state: S;
+  queue: S[];
+};
+
+export type EffectHook = {
+  hookDeps: unknown[];
+  hooksCleanup: CleanupFunction;
+};
+
+export type ReducerHook<S, A> = {
+  state: S;
+  queue: A[];
+};
+
+export type EffectCallback = () => void | CleanupFunction;
+
+export type CleanupFunction = () => void;
+
+export interface ContextValue<T> {
+  name: number;
+  value: T;
+}
+
+// Определяем интерфейс для контекста
+export interface ContextType<T> {
+  _value?: ContextValue<T>;
+  _name: number;
+  Provider: ({
+    value,
+    children,
+  }: {
+    value: T;
+    children: VirtualElement | VirtualElement[];
+  }) => VirtualElement | VirtualElement[];
+}
