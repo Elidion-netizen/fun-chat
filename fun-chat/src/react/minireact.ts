@@ -41,6 +41,7 @@ export const Fragment = Symbol.for('react.fragment');
 // Different processing according to the type of fiber node.
 const performUnitOfWork = (fiberNode: FiberNode): FiberNode | null => {
   const { type } = fiberNode;
+
   switch (typeof type) {
     case 'function': {
       global_object.wipFiber = fiberNode;

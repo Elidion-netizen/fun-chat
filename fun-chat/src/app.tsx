@@ -27,9 +27,16 @@ const routes = [
 ];
 
 export function App(): React.JSX.Element {
+  const [show, setShow] = React.useState(true);
   return (
     <div>
-      <Router routes={routes} fallback={<Exception404 />} />
+      {show && (
+        <div>
+          <Router routes={routes} fallback={<Exception404 />} />
+        </div>
+      )}
+
+      <button onClick={() => setShow((pre) => !pre)}>SHOW</button>
     </div>
   );
 }

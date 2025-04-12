@@ -8,6 +8,7 @@ import type {
   VirtualElementType,
 } from './types';
 import { updateDOM } from './update-dom';
+import { isRenderableElement } from './validators';
 
 // Create DOM based on node type.
 export const createDOM = (fiberNode: FiberNode): FiberNodeDOM => {
@@ -39,9 +40,9 @@ export const createElement = (
   props: Record<string, unknown> = {},
   ...child: VirtualElement[] | unknown[]
 ): VirtualElement => {
-  const children = child.map((c) =>
-    isVirtualElement(c) ? c : createTextElement(String(c))
-  );
+  const children = child
+    .filter((el) => isRenderableElement(el))
+    .map((c) => (isVirtualElement(c) ? c : createTextElement(String(c)))); //TODO filter
 
   return {
     type,

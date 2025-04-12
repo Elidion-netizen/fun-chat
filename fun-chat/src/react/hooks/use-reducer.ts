@@ -10,6 +10,7 @@ export function useReducer<S, A>(
   const hook: ReducerHook<S, A> = fiberNode?.alternate?.hooks
     ? (fiberNode.alternate.hooks[global_object.hookIndex] as ReducerHook<S, A>)
     : {
+        tag: 'reducer',
         state: initialAction
           ? reducer(initialState, initialAction)
           : initialState,

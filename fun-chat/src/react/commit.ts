@@ -2,6 +2,7 @@ import { global_object } from './global';
 import { isDefine } from './helpers';
 import type { FiberNode, FiberNodeDOM } from './types';
 import { updateDOM } from './update-dom';
+import { isEffectHook } from './validators';
 
 export const commitDeletion = (
   parentDOM: FiberNodeDOM,
@@ -56,6 +57,7 @@ export const commitRoot = (): void => {
   };
 
   for (const deletion of global_object.deletions) {
+    commitCleanupEffects(deletion);
     if (typeof deletion.type === 'function') {
       const parentFiber = findParentFiber(deletion.child);
       if (deletion.child?.dom) {
@@ -88,4 +90,17 @@ const findParentFiber = <S>(
   }
 
   return null;
+};
+
+const commitCleanupEffects = (fiber: FiberNode): void => {
+  if (fiber.child) commitCleanupEffects(fiber.child);
+  if (fiber.sibling) commitCleanupEffects(fiber.sibling);
+
+  if (fiber.hooks) {
+    for (const hook of fiber.hooks) {
+      if (isEffectHook(hook)) {
+        hook.hooksCleanup();
+      }
+    }
+  }
 };

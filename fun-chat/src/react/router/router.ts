@@ -12,12 +12,13 @@ export const Router = ({ routes, fallback }: RouterProps): React.ReactNode => {
 
   const handleHashChange = useCallback(() => {
     setCurrentPath(window.location.pathname);
-    console.log(window.location.pathname);
   }, []);
 
   useEffect(() => {
     window.addEventListener('popstate', handleHashChange);
-    return (): void => window.removeEventListener('popstate', handleHashChange);
+    return (): void => {
+      window.removeEventListener('popstate', handleHashChange);
+    };
   }, [handleHashChange]);
 
   const result =

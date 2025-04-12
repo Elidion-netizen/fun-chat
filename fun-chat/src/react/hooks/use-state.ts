@@ -9,6 +9,7 @@ export function useState<S>(
   const hook: StateHook<S> = fiberNode?.alternate?.hooks
     ? (fiberNode.alternate.hooks[global_object.hookIndex] as StateHook<S>)
     : {
+        tag: 'state',
         state: initState,
         queue: [],
       };

@@ -31,26 +31,32 @@ export interface FiberNode<S = unknown, A = unknown, T = unknown>
 }
 
 export type StateHook<S> = {
+  tag: HookTag;
   state: S;
   queue: S[];
 };
 
 export type EffectHook = {
+  tag: HookTag;
   hookDeps: unknown[];
   hooksCleanup: CleanupFunction;
 };
 
 export type ReducerHook<S, A> = {
+  tag: HookTag;
   state: S;
   queue: A[];
 };
 
 export type MemoHook<S> = {
+  tag: HookTag;
   value: S;
   deps: unknown[];
 };
 
-export type EffectCallback = () => void | CleanupFunction;
+type HookTag = 'effect' | 'state' | 'memo' | 'reducer';
+
+export type EffectCallback = () => CleanupFunction;
 
 export type CleanupFunction = () => void;
 

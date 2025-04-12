@@ -6,6 +6,7 @@ export function useMemo<S, T>(factory: () => S, deps: T[]): S {
   const hook: MemoHook<S> = fiberNode?.alternate?.hooks
     ? (fiberNode.alternate.hooks[global_object.hookIndex] as MemoHook<S>)
     : {
+        tag: 'memo',
         value: factory(),
         deps: [],
       };
