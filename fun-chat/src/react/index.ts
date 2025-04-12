@@ -1,7 +1,9 @@
 import { createContext } from './context';
 import { createElement } from './create-dom';
+import { useCallback } from './hooks/use-callback';
 import { useContext } from './hooks/use-context';
 import { useEffect } from './hooks/use-effect';
+import { useMemo } from './hooks/use-memo';
 import { useReducer } from './hooks/use-reducer';
 import { useRef } from './hooks/use-ref';
 import { useState } from './hooks/use-state';
@@ -16,4 +18,6 @@ export default {
   useReducer,
   createContext,
   useContext,
+  useMemo,
+  useCallback,
 };

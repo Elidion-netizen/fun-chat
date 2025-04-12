@@ -26,7 +26,7 @@ export interface FiberNode<S = unknown, A = unknown, T = unknown>
   child?: FiberNode;
   return?: FiberNode;
   sibling?: FiberNode;
-  hooks?: (StateHook<S> | EffectHook | ReducerHook<S, A>)[];
+  hooks?: (StateHook<S> | EffectHook | ReducerHook<S, A> | MemoHook<A>)[];
   context: Map<number, T>;
 }
 
@@ -45,6 +45,11 @@ export type ReducerHook<S, A> = {
   queue: A[];
 };
 
+export type MemoHook<S> = {
+  value: S;
+  deps: unknown[];
+};
+
 export type EffectCallback = () => void | CleanupFunction;
 
 export type CleanupFunction = () => void;
@@ -54,7 +59,6 @@ export interface ContextValue<T> {
   value: T;
 }
 
-// Определяем интерфейс для контекста
 export interface ContextType<T> {
   _value?: ContextValue<T>;
   _name: number;
