@@ -7,7 +7,7 @@ export function isEffectHook(
     | ReducerHook<unknown, unknown>
     | MemoHook<unknown>
 ): obj is EffectHook {
-  return 'type' in obj && obj.type === 'effect';
+  return 'tag' in obj && obj.tag === 'effect';
 }
 
 export function isRenderableElement(el: unknown): boolean {

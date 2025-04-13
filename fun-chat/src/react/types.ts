@@ -28,6 +28,7 @@ export interface FiberNode<S = unknown, A = unknown, T = unknown>
   sibling?: FiberNode;
   hooks?: (StateHook<S> | EffectHook | ReducerHook<S, A> | MemoHook<A>)[];
   context: Map<number, T>;
+  pendingEffects: EffectHook[];
 }
 
 export type StateHook<S> = {
@@ -39,7 +40,8 @@ export type StateHook<S> = {
 export type EffectHook = {
   tag: HookTag;
   hookDeps: unknown[];
-  hooksCleanup: CleanupFunction;
+  create: EffectCallback;
+  destroy: CleanupFunction | undefined;
 };
 
 export type ReducerHook<S, A> = {

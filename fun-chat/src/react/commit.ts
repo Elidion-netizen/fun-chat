@@ -1,6 +1,6 @@
 import { global_object } from './global';
 import { isDefine } from './helpers';
-import type { FiberNode, FiberNodeDOM } from './types';
+import type { EffectHook, FiberNode, FiberNodeDOM } from './types';
 import { updateDOM } from './update-dom';
 import { isEffectHook } from './validators';
 
@@ -76,6 +76,10 @@ export const commitRoot = (): void => {
   }
 
   global_object.wipRoot = null;
+
+  queueMicrotask(() => {
+    commitEffects();
+  });
 };
 
 const findParentFiber = <S>(
@@ -98,9 +102,35 @@ const commitCleanupEffects = (fiber: FiberNode): void => {
 
   if (fiber.hooks) {
     for (const hook of fiber.hooks) {
-      if (isEffectHook(hook)) {
-        hook.hooksCleanup();
+      if (isEffectHook(hook) && hook.destroy) {
+        hook.destroy();
       }
+    }
+  }
+};
+
+const commitEffects = (): void => {
+  const traverseFiber = (fiber?: FiberNode): void => {
+    if (!fiber) return;
+    if (fiber.pendingEffects) {
+      console.log(fiber.pendingEffects);
+      for (const hook of fiber.pendingEffects) {
+        runEffect(hook);
+      }
+      fiber.pendingEffects = [];
+    }
+    traverseFiber(fiber.child);
+    traverseFiber(fiber.sibling);
+  };
+
+  traverseFiber(global_object.currentRoot?.child);
+};
+
+const runEffect = (hook: EffectHook): void => {
+  if (typeof hook.create === 'function') {
+    const cleanup = hook.create();
+    if (typeof cleanup === 'function') {
+      hook.destroy = cleanup;
     }
   }
 };
