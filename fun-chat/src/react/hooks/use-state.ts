@@ -1,5 +1,5 @@
 import { global_object } from '../global';
-// import { isDefine } from '../helpers';
+import { scheduleUpdate } from '../helpers';
 import type { FiberNode, StateHook } from '../types';
 
 export function useState<S>(
@@ -19,9 +19,7 @@ export function useState<S>(
     if (isPlainObject(hook.state) && isPlainObject(newState)) {
       newState = { ...hook.state, ...newState };
     }
-    // if (isDefine(newState)) { //TODO null in state
     hook.state = newState as S;
-    // }
   }
 
   if (fiberNode.hooks === undefined) {
@@ -34,18 +32,8 @@ export function useState<S>(
   const setState = (value: S | ((value: S) => S)): void => {
     const newState = transformState(value, hook.state);
     hook.queue.push(newState);
-    if (global_object.currentRoot) {
-      global_object.wipRoot = {
-        type: global_object.currentRoot.type,
-        dom: global_object.currentRoot.dom,
-        props: global_object.currentRoot.props,
-        alternate: global_object.currentRoot,
-        context: global_object.context,
-      };
-      global_object.nextUnitOfWork = global_object.wipRoot;
-      global_object.deletions = [];
-      global_object.currentRoot = null;
-    }
+
+    scheduleUpdate();
   };
 
   return [hook.state, setState];

@@ -1,4 +1,5 @@
 import { global_object } from '../global';
+import { scheduleUpdate } from '../helpers';
 import type { FiberNode, ReducerHook } from '../types';
 
 export function useReducer<S, A>(
@@ -32,18 +33,7 @@ export function useReducer<S, A>(
   const dispatch = (action: A): void => {
     hook.queue.push(action);
 
-    if (global_object.currentRoot) {
-      global_object.wipRoot = {
-        type: global_object.currentRoot.type,
-        dom: global_object.currentRoot.dom,
-        props: global_object.currentRoot.props,
-        alternate: global_object.currentRoot,
-        context: global_object.context,
-      };
-      global_object.nextUnitOfWork = global_object.wipRoot;
-      global_object.deletions = [];
-      global_object.currentRoot = null;
-    }
+    scheduleUpdate();
   };
 
   return [hook.state, dispatch];
