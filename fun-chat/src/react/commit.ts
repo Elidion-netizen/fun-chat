@@ -77,9 +77,7 @@ export const commitRoot = (): void => {
 
   global_object.wipRoot = null;
 
-  queueMicrotask(() => {
-    commitEffects();
-  });
+  commitEffects();
 };
 
 const findParentFiber = <S>(
@@ -112,18 +110,34 @@ const commitCleanupEffects = (fiber: FiberNode): void => {
 const commitEffects = (): void => {
   const traverseFiber = (fiber?: FiberNode): void => {
     if (!fiber) return;
-    if (fiber.pendingEffects) {
-      console.log(fiber.pendingEffects);
-      for (const hook of fiber.pendingEffects) {
+
+    if (fiber.pendingLayoutEffects) {
+      for (const hook of fiber.pendingLayoutEffects) {
         runEffect(hook);
       }
+      fiber.pendingLayoutEffects = [];
+    }
+
+    if (fiber.pendingEffects) {
+      global_object.passiveEffectQueue ||= [];
+      global_object.passiveEffectQueue.push(...fiber.pendingEffects);
       fiber.pendingEffects = [];
     }
+
     traverseFiber(fiber.child);
     traverseFiber(fiber.sibling);
   };
 
   traverseFiber(global_object.currentRoot?.child);
+
+  if (global_object.passiveEffectQueue?.length) {
+    queueMicrotask(() => {
+      while (global_object.passiveEffectQueue.length > 0) {
+        const hook = global_object.passiveEffectQueue.shift();
+        if (hook) runEffect(hook);
+      }
+    });
+  }
 };
 
 const runEffect = (hook: EffectHook): void => {

@@ -1,4 +1,4 @@
-import type { FiberNode } from './types';
+import type { EffectHook, FiberNode } from './types';
 
 interface GlobalObject<T = unknown> {
   wipRoot: FiberNode | null;
@@ -8,6 +8,7 @@ interface GlobalObject<T = unknown> {
   wipFiber?: FiberNode;
   hookIndex: number;
   context: Map<number, T>;
+  passiveEffectQueue: EffectHook[];
 }
 export const global_object: GlobalObject = {
   wipRoot: null,
@@ -16,4 +17,5 @@ export const global_object: GlobalObject = {
   deletions: [],
   hookIndex: 0,
   context: new Map(),
+  passiveEffectQueue: [],
 };

@@ -7,7 +7,7 @@ export function isEffectHook(
     | ReducerHook<unknown, unknown>
     | MemoHook<unknown>
 ): obj is EffectHook {
-  return 'tag' in obj && obj.tag === 'effect';
+  return 'tag' in obj && (obj.tag === 'effect' || obj.tag === 'layout-effect');
 }
 
 export function isRenderableElement(el: unknown): boolean {

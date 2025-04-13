@@ -29,6 +29,7 @@ export interface FiberNode<S = unknown, A = unknown, T = unknown>
   hooks?: (StateHook<S> | EffectHook | ReducerHook<S, A> | MemoHook<A>)[];
   context: Map<number, T>;
   pendingEffects: EffectHook[];
+  pendingLayoutEffects: EffectHook[];
 }
 
 export type StateHook<S> = {
@@ -56,7 +57,7 @@ export type MemoHook<S> = {
   deps: unknown[];
 };
 
-type HookTag = 'effect' | 'state' | 'memo' | 'reducer';
+type HookTag = 'effect' | 'state' | 'memo' | 'reducer' | 'layout-effect';
 
 export type EffectCallback = () => CleanupFunction;
 

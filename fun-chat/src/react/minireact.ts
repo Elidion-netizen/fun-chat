@@ -110,6 +110,8 @@ export const render = (
     },
     alternate: global_object.currentRoot,
     context: global_object.context,
+    pendingEffects: [],
+    pendingLayoutEffects: [],
   };
   global_object.nextUnitOfWork = global_object.wipRoot;
   global_object.deletions = [];

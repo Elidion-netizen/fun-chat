@@ -2,7 +2,10 @@ import { global_object } from '../global';
 import { sameArray } from '../helpers';
 import type { EffectCallback, EffectHook, FiberNode } from '../types';
 
-export function useEffect<S>(effect: EffectCallback, deps: unknown[]): void {
+export function useLayoutEffect<S>(
+  effect: EffectCallback,
+  deps: unknown[]
+): void {
   const fiberNode: FiberNode<S> = global_object.wipFiber as FiberNode<S>;
   const oldHook = fiberNode.alternate?.hooks?.[
     global_object.hookIndex
@@ -11,15 +14,20 @@ export function useEffect<S>(effect: EffectCallback, deps: unknown[]): void {
   const hasChanged = !oldHook || !deps || !sameArray(deps, oldHook.hookDeps);
 
   const hook: EffectHook = oldHook
-    ? { ...oldHook, create: effect, hookDeps: deps }
-    : { tag: 'effect', hookDeps: deps, create: effect, destroy: undefined };
+    ? { ...oldHook, create: effect, hookDeps: deps, tag: 'layout-effect' }
+    : {
+        tag: 'layout-effect',
+        hookDeps: deps,
+        create: effect,
+        destroy: undefined,
+      };
 
   if (hasChanged) {
-    fiberNode.pendingEffects ||= [];
-    fiberNode.pendingEffects.push(hook);
+    fiberNode.pendingLayoutEffects ||= [];
+    fiberNode.pendingLayoutEffects.push(hook);
   }
 
-  fiberNode.hooks ||= [];
+  if (!fiberNode.hooks) fiberNode.hooks = [];
   fiberNode.hooks.push(hook);
   global_object.hookIndex += 1;
 }
