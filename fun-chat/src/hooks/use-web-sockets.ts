@@ -1,7 +1,7 @@
 import React from '@/react';
 import { navigate } from '@/react/router';
 import type { SocketMessage, UserData, WebSocketHook } from '@/types';
-import { isUserResponseData } from '@/validators';
+import { isUserLoginResponse, isUserLogoutResponse } from '@/validators';
 
 export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
@@ -22,10 +22,17 @@ export function useWebSockets(): WebSocketHook {
     ws.onmessage = (message): void => {
       if (typeof message.data !== 'string') return;
       const data: unknown = JSON.parse(message.data);
-      if (isUserResponseData(data)) {
+
+      if (isUserLoginResponse(data)) {
         const isLog = data.payload.user.isLogined;
         if (isLog) {
           navigate('/chat');
+        }
+      }
+      if (isUserLogoutResponse(data)) {
+        const isLog = data.payload.user.isLogined;
+        if (!isLog) {
+          navigate('/');
         }
       }
     };
@@ -40,53 +47,46 @@ export function useWebSockets(): WebSocketHook {
     };
   }, []);
 
-  const sendMessage = React.useCallback(
-    (message: SocketMessage): void => {
-      if (!idRef.current) {
-        idRef.current = crypto.randomUUID();
-      }
-      if (
-        message.type === 'USER_LOGIN' &&
-        message.payload.user &&
-        typeof message.payload.user === 'object' &&
-        message.payload.user !== null &&
-        'login' in message.payload.user &&
-        'password' in message.payload.user &&
-        typeof message.payload.user.login === 'string' &&
-        typeof message.payload.user.password === 'string'
-      ) {
-        setUserData({
-          login: message.payload.user.login,
-          password: message.payload.user.password,
-        });
-      }
+  const sendMessage = (message: SocketMessage): void => {
+    if (!idRef.current) {
+      idRef.current = crypto.randomUUID();
+    }
+    if (
+      message.type === 'USER_LOGIN' &&
+      message.payload.user &&
+      typeof message.payload.user === 'object' &&
+      message.payload.user !== null &&
+      'login' in message.payload.user &&
+      'password' in message.payload.user &&
+      typeof message.payload.user.login === 'string' &&
+      typeof message.payload.user.password === 'string'
+    ) {
+      setUserData({
+        login: message.payload.user.login,
+        password: message.payload.user.password,
+      });
+    }
 
-      const data = {
-        ...message,
-        id: idRef.current,
+    const data = {
+      ...message,
+      id: idRef.current,
+    };
+
+    if (message.type === 'USER_LOGOUT') {
+      data.payload = {
+        user: {
+          login: userData?.login,
+          password: userData?.password,
+        },
       };
+    }
 
-      if (message.type === 'USER_LOGOUT') {
-        data.payload = {
-          user: {
-            login: userData?.login,
-            password: userData?.password,
-          },
-        };
-        console.log(data);
-      }
-
-      if (
-        socketRef.current &&
-        socketRef.current.readyState === WebSocket.OPEN
-      ) {
-        socketRef.current.send(JSON.stringify(data));
-      } else {
-        console.error('WebSocket is not open. Unable to send message.');
-      }
-    },
-    [socketRef.current]
-  );
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify(data));
+    } else {
+      console.error('WebSocket is not open. Unable to send message.');
+    }
+  };
 
   const disconnect = React.useCallback(() => {
     if (socketRef.current) {
@@ -94,5 +94,5 @@ export function useWebSockets(): WebSocketHook {
     }
   }, [socketRef.current]);
 
-  return { connect, sendMessage, disconnect, isConnected };
+  return { connect, sendMessage, disconnect, isConnected, userData };
 }

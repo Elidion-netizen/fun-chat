@@ -3,6 +3,7 @@ export type WebSocketHook = {
   sendMessage: (message: SocketMessage) => void;
   disconnect: () => void;
   isConnected: boolean;
+  userData: UserData | null;
 };
 
 export type SocketMessage = {
@@ -10,11 +11,13 @@ export type SocketMessage = {
   payload: Record<string, unknown>;
 };
 
-export type LoginResponse = LoginResponseData | LoginResponseError;
+export type LoginResponse = LoginResponseData & { type: 'USER_LOGIN' };
+
+export type LogoutResponse = LoginResponseData & { type: 'USER_LOGOUT' };
 
 export type LoginResponseData = {
   id: string;
-  type: 'USER_LOGIN';
+  type: 'USER_LOGIN' | 'USER_LOGOUT';
   payload: {
     user: {
       login: string;
@@ -27,7 +30,7 @@ export type LoginResponseError = {
   id: string;
   type: 'ERROR';
   payload: {
-    error: 'a user with this login is already authorized';
+    error: string;
   };
 };
 

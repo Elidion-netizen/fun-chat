@@ -13,7 +13,8 @@ const routes = [
 
 export const Context = React.createContext<WebSocketHook>();
 export function App(): React.JSX.Element {
-  const { connect, sendMessage, disconnect, isConnected } = useWebSockets();
+  const { connect, sendMessage, disconnect, isConnected, userData } =
+    useWebSockets();
 
   React.useEffect(() => {
     connect();
@@ -22,7 +23,7 @@ export function App(): React.JSX.Element {
   return (
     <main>
       <Context.Provider
-        value={{ connect, sendMessage, disconnect, isConnected }}
+        value={{ connect, sendMessage, disconnect, isConnected, userData }}
       >
         <Router routes={routes} fallback={<NotFound />} />
         <p className={isConnected ? 'text-green-500' : 'text-red-500'}>

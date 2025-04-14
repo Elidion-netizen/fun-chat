@@ -1,10 +1,10 @@
 import { Context } from '@/app';
 import React from '@/react';
 export function Chat(): React.JSX.Element {
-  const { sendMessage } = React.useContext(Context);
+  const { sendMessage, userData } = React.useContext(Context);
 
   function logout(): void {
-    sendMessage({ type: 'USER_LOGOUT', payload: {} });
+    sendMessage({ type: 'USER_LOGOUT', payload: { user: userData } });
   }
   return (
     <section>
