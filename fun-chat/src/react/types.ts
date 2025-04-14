@@ -59,7 +59,7 @@ export type MemoHook<S> = {
 
 type HookTag = 'effect' | 'state' | 'memo' | 'reducer' | 'layout-effect';
 
-export type EffectCallback = () => CleanupFunction;
+export type EffectCallback = () => CleanupFunction | void;
 
 export type CleanupFunction = () => void;
 
@@ -76,6 +76,6 @@ export interface ContextType<T> {
     children,
   }: {
     value: T;
-    children: VirtualElement | VirtualElement[];
-  }) => VirtualElement | VirtualElement[];
+    children: React.ReactNode | React.ReactNode[];
+  }) => React.ReactNode | React.ReactNode[];
 }

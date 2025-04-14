@@ -1,9 +1,14 @@
+import { Context } from '@/app';
 import React from '@/react';
-import { Link } from '@/react/router/link';
 export function Chat(): React.JSX.Element {
+  const { sendMessage } = React.useContext(Context);
+
+  function logout(): void {
+    sendMessage({ type: 'USER_LOGOUT', payload: {} });
+  }
   return (
     <section>
-      <Link to="/"> Logout </Link>
+      <button onClick={() => logout()}>Logout</button>
     </section>
   );
 }

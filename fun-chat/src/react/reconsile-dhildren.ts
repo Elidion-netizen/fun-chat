@@ -40,6 +40,8 @@ export const reconcileChildren = (
         return: fiberNode,
         effectTag: 'UPDATE',
         context: global_object.context,
+        pendingEffects: oldFiberNode.pendingEffects,
+        pendingLayoutEffects: oldFiberNode.pendingLayoutEffects,
       };
     }
     if (!isSameType && Boolean(virtualElement)) {
@@ -52,6 +54,8 @@ export const reconcileChildren = (
         return: fiberNode,
         effectTag: 'REPLACEMENT',
         context: global_object.context,
+        pendingEffects: [],
+        pendingLayoutEffects: [],
       };
     }
     if (!isSameType && oldFiberNode) {
