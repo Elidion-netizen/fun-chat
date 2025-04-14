@@ -5,6 +5,7 @@ export type WebSocketHook = {
   isConnected: boolean;
   userData: UserData | null;
   userlist: User[];
+  messages: Message[];
 };
 
 export type SocketMessage = {
@@ -65,5 +66,26 @@ export type AllUsers = {
   type: 'USER_ACTIVE' | 'USER_INACTIVE';
   payload: {
     users: User[];
+  };
+};
+
+export type AllMessages = {
+  id: null;
+  type: 'MSG_SEND';
+  payload: {
+    messages: Message[];
+  };
+};
+
+export type Message = {
+  id: string;
+  from: string;
+  to: string;
+  text: string;
+  datetime: number;
+  status: {
+    isDelivered: boolean;
+    isReaded: boolean;
+    isEdited: boolean;
   };
 };

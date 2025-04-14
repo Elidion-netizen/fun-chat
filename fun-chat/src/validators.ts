@@ -6,6 +6,8 @@ import type {
   ResponseData,
   LogoutResponse,
   UserActivate,
+  Message,
+  AllMessages,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -48,6 +50,24 @@ export function isUserInactive(data: unknown): data is UserActivate {
   );
 }
 
+export function isAllMessages(data: unknown): data is AllMessages {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    typeof data.id === 'string' &&
+    'type' in data &&
+    data.type === 'MSG_FROM_USER' &&
+    'payload' in data &&
+    typeof data.payload === 'object' &&
+    data.payload !== null &&
+    'messages' in data.payload &&
+    Array.isArray(data.payload.messages) &&
+    (data.payload.messages.length === 0 ||
+      validMessage(data.payload.messages[0]))
+  );
+}
+
 const validUserResponse = (data: unknown): data is ResponseData => {
   return (
     typeof data === 'object' &&
@@ -76,8 +96,34 @@ const validUsers = (data: unknown): data is AllUsers => {
     data.payload !== null &&
     'users' in data.payload &&
     Array.isArray(data.payload.users) &&
-    typeof data.payload.users[0] === 'object' &&
-    'isLogined' in data.payload.users[0] &&
-    'login' in data.payload.users[0]
+    (data.payload.users.length === 0 ||
+      (typeof data.payload.users[0] === 'object' &&
+        'isLogined' in data.payload.users[0] &&
+        'login' in data.payload.users[0]))
+  );
+};
+
+const validMessage = (data: unknown): data is Message => {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    'from' in data &&
+    typeof data.from === 'string' &&
+    'to' in data &&
+    typeof data.to === 'string' &&
+    'text' in data &&
+    typeof data.text === 'string' &&
+    'datetime' in data &&
+    typeof data.datetime === 'number' &&
+    'status' in data &&
+    typeof data.status === 'object' &&
+    data.status !== null &&
+    'isDelivered' in data.status &&
+    typeof data.status.isDelivered === 'boolean' &&
+    'isReaded' in data.status &&
+    typeof data.status.isReaded === 'boolean' &&
+    'isEdited' in data.status &&
+    typeof data.status.isEdited === 'boolean'
   );
 };

@@ -13,8 +13,15 @@ const routes = [
 
 export const Context = React.createContext<WebSocketHook>();
 export function App(): React.JSX.Element {
-  const { connect, sendMessage, disconnect, isConnected, userData, userlist } =
-    useWebSockets();
+  const {
+    connect,
+    sendMessage,
+    disconnect,
+    isConnected,
+    userData,
+    userlist,
+    messages,
+  } = useWebSockets();
 
   React.useEffect(() => {
     connect();
@@ -30,6 +37,7 @@ export function App(): React.JSX.Element {
           isConnected,
           userData,
           userlist,
+          messages,
         }}
       >
         <Router routes={routes} fallback={<NotFound />} />

@@ -1,7 +1,14 @@
 import React from '@/react';
 import { navigate } from '@/react/router';
-import type { SocketMessage, User, UserData, WebSocketHook } from '@/types';
+import type {
+  Message,
+  SocketMessage,
+  User,
+  UserData,
+  WebSocketHook,
+} from '@/types';
 import {
+  isAllMessages,
   isAuthUsersResponse,
   isUnauthUsersResponse,
   isUserActive,
@@ -14,6 +21,7 @@ export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [userData, setUserData] = React.useState<UserData | null>(null);
   const [userlist, setUserlist] = React.useState<User[]>([]);
+  const [messages, setMessages] = React.useState<Message[]>([]);
   const socketRef = React.useRef<WebSocket | null>(null);
   const idRef = React.useRef<string | null>(null);
 
@@ -79,6 +87,10 @@ export function useWebSockets(): WebSocketHook {
             element.login === user.login ? data.payload.user : element
           );
         });
+      }
+
+      if (isAllMessages(data)) {
+        setMessages(data.payload.messages);
       }
 
       if (isUserLogoutResponse(data)) {
@@ -155,5 +167,13 @@ export function useWebSockets(): WebSocketHook {
     }
   }, [socketRef.current]);
 
-  return { connect, sendMessage, disconnect, isConnected, userData, userlist };
+  return {
+    connect,
+    sendMessage,
+    disconnect,
+    isConnected,
+    userData,
+    userlist,
+    messages,
+  };
 }
