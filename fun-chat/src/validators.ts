@@ -8,6 +8,8 @@ import type {
   UserActivate,
   Message,
   AllMessages,
+  SingleMessage,
+  MessageResponse,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -52,19 +54,22 @@ export function isUserInactive(data: unknown): data is UserActivate {
 
 export function isAllMessages(data: unknown): data is AllMessages {
   return (
-    typeof data === 'object' &&
-    data !== null &&
-    'id' in data &&
+    validMessageResponse(data) &&
     typeof data.id === 'string' &&
-    'type' in data &&
     data.type === 'MSG_FROM_USER' &&
-    'payload' in data &&
-    typeof data.payload === 'object' &&
-    data.payload !== null &&
     'messages' in data.payload &&
     Array.isArray(data.payload.messages) &&
     (data.payload.messages.length === 0 ||
       validMessage(data.payload.messages[0]))
+  );
+}
+
+export function isMessage(data: unknown): data is SingleMessage {
+  return (
+    validMessageResponse(data) &&
+    data.type === 'MSG_SEND' &&
+    'message' in data.payload &&
+    validMessage(data.payload.message)
   );
 }
 
@@ -125,5 +130,17 @@ const validMessage = (data: unknown): data is Message => {
     typeof data.status.isReaded === 'boolean' &&
     'isEdited' in data.status &&
     typeof data.status.isEdited === 'boolean'
+  );
+};
+
+const validMessageResponse = (data: unknown): data is MessageResponse => {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    'type' in data &&
+    'payload' in data &&
+    typeof data.payload === 'object' &&
+    data.payload !== null
   );
 };

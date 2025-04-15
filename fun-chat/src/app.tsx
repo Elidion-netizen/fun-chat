@@ -21,6 +21,7 @@ export function App(): React.JSX.Element {
     userData,
     userlist,
     messages,
+    talker,
   } = useWebSockets();
 
   React.useEffect(() => {
@@ -28,7 +29,7 @@ export function App(): React.JSX.Element {
   }, [connect]);
 
   return (
-    <main>
+    <main className="h-screen">
       <Context.Provider
         value={{
           connect,
@@ -38,12 +39,13 @@ export function App(): React.JSX.Element {
           userData,
           userlist,
           messages,
+          talker,
         }}
       >
-        <Router routes={routes} fallback={<NotFound />} />
         <p className={isConnected ? 'text-green-500' : 'text-red-500'}>
           Connection
         </p>
+        <Router routes={routes} fallback={<NotFound />} />
       </Context.Provider>
     </main>
   );

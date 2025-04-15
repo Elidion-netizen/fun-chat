@@ -5,7 +5,8 @@ export type WebSocketHook = {
   isConnected: boolean;
   userData: UserData | null;
   userlist: User[];
-  messages: Message[];
+  messages: MessageState;
+  talker: { current: string | null };
 };
 
 export type SocketMessage = {
@@ -69,13 +70,27 @@ export type AllUsers = {
   };
 };
 
-export type AllMessages = {
+export type MessageResponse = {
   id: null;
-  type: 'MSG_SEND';
+  type: 'MSG_SEND' | 'MSG_FROM_USER';
+  payload: Record<string, unknown>;
+};
+
+export type AllMessages = MessageResponse & {
+  type: 'MSG_FROM_USER';
   payload: {
     messages: Message[];
   };
 };
+
+export type SingleMessage = MessageResponse & {
+  type: 'MSG_SEND';
+  payload: {
+    message: Message;
+  };
+};
+
+export type MessageState = Record<string, Message[]>;
 
 export type Message = {
   id: string;

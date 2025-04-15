@@ -1,7 +1,7 @@
 import React from '@/react';
 import { navigate } from '@/react/router';
 import type {
-  Message,
+  MessageState,
   SocketMessage,
   User,
   UserData,
@@ -10,6 +10,7 @@ import type {
 import {
   isAllMessages,
   isAuthUsersResponse,
+  isMessage,
   isUnauthUsersResponse,
   isUserActive,
   isUserInactive,
@@ -21,9 +22,10 @@ export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [userData, setUserData] = React.useState<UserData | null>(null);
   const [userlist, setUserlist] = React.useState<User[]>([]);
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [messages, setMessages] = React.useState<MessageState>({});
   const socketRef = React.useRef<WebSocket | null>(null);
   const idRef = React.useRef<string | null>(null);
+  const talker = React.useRef<string | null>(null);
 
   const connect = React.useCallback(() => {
     if (socketRef.current) return;
@@ -90,7 +92,22 @@ export function useWebSockets(): WebSocketHook {
       }
 
       if (isAllMessages(data)) {
-        setMessages(data.payload.messages);
+        const login = talker.current;
+        if (!login) return;
+        setMessages((prev) => {
+          return { ...prev, [login]: data.payload.messages };
+        });
+      }
+
+      if (isMessage(data)) {
+        const user = talker.current;
+        if (!user) return;
+        setMessages((pre) => {
+          return {
+            ...pre,
+            [user]: [...pre[user], data.payload.message],
+          };
+        });
       }
 
       if (isUserLogoutResponse(data)) {
@@ -111,7 +128,7 @@ export function useWebSockets(): WebSocketHook {
     ws.onerror = (error): void => {
       console.error(error);
     };
-  }, [userlist]);
+  }, []);
 
   const sendMessage = React.useCallback(
     (message: SocketMessage): void => {
@@ -140,15 +157,6 @@ export function useWebSockets(): WebSocketHook {
         id: idRef.current,
       };
 
-      if (message.type === 'USER_LOGOUT') {
-        data.payload = {
-          user: {
-            login: userData?.login,
-            password: userData?.password,
-          },
-        };
-      }
-
       if (
         socketRef.current &&
         socketRef.current.readyState === WebSocket.OPEN
@@ -158,7 +166,7 @@ export function useWebSockets(): WebSocketHook {
         console.error('WebSocket is not open. Unable to send message.');
       }
     },
-    [socketRef.current, userData]
+    [socketRef.current]
   );
 
   const disconnect = React.useCallback(() => {
@@ -175,5 +183,6 @@ export function useWebSockets(): WebSocketHook {
     userData,
     userlist,
     messages,
+    talker,
   };
 }

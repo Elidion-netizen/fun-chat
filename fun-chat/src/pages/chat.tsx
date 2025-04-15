@@ -1,10 +1,9 @@
 import { Context } from '@/app';
 import React from '@/react';
 export function Chat(): React.JSX.Element {
-  const { sendMessage, userData, userlist, messages } =
+  const { sendMessage, userData, userlist, messages, talker } =
     React.useContext(Context);
   const [chatMessage, setChatMessage] = React.useState('');
-  const [talker, setTalker] = React.useState<string | null>(null);
 
   function logout(): void {
     sendMessage({ type: 'USER_LOGOUT', payload: { user: userData } });
@@ -13,16 +12,16 @@ export function Chat(): React.JSX.Element {
   function activateChat(login: string): void {
     if (userData?.login === login) return;
     sendMessage({ type: 'MSG_FROM_USER', payload: { user: { login } } });
-    setTalker(login);
+    talker.current = login;
   }
 
   function sendNewMessage(): void {
-    if (chatMessage.length === 0 || talker === null) return;
+    if (chatMessage.length === 0 || talker.current === null) return;
     sendMessage({
       type: 'MSG_SEND',
       payload: {
         message: {
-          to: talker,
+          to: talker.current,
           text: chatMessage,
         },
       },
@@ -31,37 +30,58 @@ export function Chat(): React.JSX.Element {
   }
 
   return (
-    <section>
-      <ul>
-        {userlist
-          .sort((a, b) =>
-            a.isLogined === b.isLogined ? 0 : a.isLogined ? -1 : 1
-          )
-          .map((el) => (
-            <li
-              className={el.isLogined ? 'text-green-600' : 'text-gray-400'}
-              onClick={() => activateChat(el.login)}
-            >
-              {el.login}
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {messages.length > 0 &&
-          messages.map((el) => (
-            <li>
-              <p>{el.from}</p>
-              <p>{el.to}</p>
-              <p>{el.text}</p>
-            </li>
-          ))}
-      </ul>
-      <input
-        value={chatMessage}
-        onChange={(e) => setChatMessage(e.target.value)}
-      ></input>
-      <button onClick={sendNewMessage}>Send</button>
-      <button onClick={() => logout()}>Logout</button>
+    <section className="flex h-full">
+      <div className="w-1/4 bg-gray-200 p-4 border-r">
+        <h3 className="font-bold mb-2">List of users</h3>
+        <ul>
+          {userlist
+            .sort((a, b) =>
+              a.isLogined === b.isLogined ? 0 : a.isLogined ? -1 : 1
+            )
+            .filter((el) => el.login !== userData?.login)
+            .map((el) => (
+              <li
+                className={`cursor-pointer ${el.isLogined ? 'text-green-600' : 'text-gray-400'}`}
+                onClick={() => activateChat(el.login)}
+              >
+                {el.login}
+              </li>
+            ))}
+        </ul>
+      </div>
+      <div className="flex-1 flex flex-col">
+        {talker.current && <h3>Chat with {talker.current}</h3>}
+        <div className="flex-1 p-4 overflow-y-auto bg-white">
+          {talker.current &&
+            `${talker.current}` in messages &&
+            messages[talker.current].length > 0 &&
+            messages[talker.current].map((el) => (
+              <div>
+                <p>{el.from}</p>
+                <p>{el.to}</p>
+                <p>{el.text}</p>
+              </div>
+            ))}
+        </div>
+
+        <div className="p-4 bg-gray-200 flex">
+          <input
+            value={chatMessage}
+            onChange={(e) => setChatMessage(e.target.value)}
+            placeholder="Введите сообщение..."
+            className="flex-1 p-2 border border-gray-300 rounded"
+          ></input>
+          <button
+            className="ml-2 p-2 bg-blue-500 text-white rounded"
+            onClick={sendNewMessage}
+          >
+            Send
+          </button>
+        </div>
+      </div>
+      <button className="absolute top-5 right-5" onClick={() => logout()}>
+        Logout
+      </button>
     </section>
   );
 }
