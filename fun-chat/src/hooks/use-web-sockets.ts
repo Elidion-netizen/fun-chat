@@ -20,12 +20,12 @@ import {
 
 export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
-  const [userData, setUserData] = React.useState<UserData | null>(null);
   const [userlist, setUserlist] = React.useState<User[]>([]);
   const [messages, setMessages] = React.useState<MessageState>({});
   const socketRef = React.useRef<WebSocket | null>(null);
   const idRef = React.useRef<string | null>(null);
   const talker = React.useRef<string | null>(null);
+  const currentUser = React.useRef<UserData | null>(null);
 
   const connect = React.useCallback(() => {
     if (socketRef.current) return;
@@ -100,14 +100,29 @@ export function useWebSockets(): WebSocketHook {
       }
 
       if (isMessage(data)) {
-        const user = talker.current;
+        const user = currentUser.current?.login;
         if (!user) return;
-        setMessages((pre) => {
-          return {
-            ...pre,
-            [user]: [...pre[user], data.payload.message],
-          };
-        });
+        if (data.payload.message.from === user) {
+          setMessages((pre) => {
+            return {
+              ...pre,
+              [data.payload.message.to]: [
+                ...pre[data.payload.message.to],
+                data.payload.message,
+              ],
+            };
+          });
+        } else {
+          setMessages((pre) => {
+            return {
+              ...pre,
+              [data.payload.message.from]: [
+                ...pre[data.payload.message.from],
+                data.payload.message,
+              ],
+            };
+          });
+        }
       }
 
       if (isUserLogoutResponse(data)) {
@@ -146,10 +161,10 @@ export function useWebSockets(): WebSocketHook {
         typeof message.payload.user.login === 'string' &&
         typeof message.payload.user.password === 'string'
       ) {
-        setUserData({
+        currentUser.current = {
           login: message.payload.user.login,
           password: message.payload.user.password,
-        });
+        };
       }
 
       const data = {
@@ -180,7 +195,7 @@ export function useWebSockets(): WebSocketHook {
     sendMessage,
     disconnect,
     isConnected,
-    userData,
+    currentUser,
     userlist,
     messages,
     talker,

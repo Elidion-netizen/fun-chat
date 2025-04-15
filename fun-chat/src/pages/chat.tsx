@@ -1,16 +1,20 @@
 import { Context } from '@/app';
 import React from '@/react';
 export function Chat(): React.JSX.Element {
-  const { sendMessage, userData, userlist, messages, talker } =
+  const { sendMessage, currentUser, userlist, messages, talker } =
     React.useContext(Context);
   const [chatMessage, setChatMessage] = React.useState('');
 
   function logout(): void {
-    sendMessage({ type: 'USER_LOGOUT', payload: { user: userData } });
+    if (!currentUser.current) return;
+    sendMessage({
+      type: 'USER_LOGOUT',
+      payload: { user: currentUser.current },
+    });
   }
 
   function activateChat(login: string): void {
-    if (userData?.login === login) return;
+    if (currentUser.current?.login === login) return;
     sendMessage({ type: 'MSG_FROM_USER', payload: { user: { login } } });
     talker.current = login;
   }
@@ -38,7 +42,7 @@ export function Chat(): React.JSX.Element {
             .sort((a, b) =>
               a.isLogined === b.isLogined ? 0 : a.isLogined ? -1 : 1
             )
-            .filter((el) => el.login !== userData?.login)
+            .filter((el) => el.login !== currentUser.current?.login)
             .map((el) => (
               <li
                 className={`cursor-pointer ${el.isLogined ? 'text-green-600' : 'text-gray-400'}`}
