@@ -29,7 +29,7 @@ export function App(): React.JSX.Element {
   }, [connect]);
 
   return (
-    <main className="h-screen">
+    <main className="h-screen relative">
       <Context.Provider
         value={{
           connect,
@@ -42,7 +42,9 @@ export function App(): React.JSX.Element {
           talker,
         }}
       >
-        <p className={isConnected ? 'text-green-500' : 'text-red-500'}>
+        <p
+          className={`absolute left-1 bottom-2 z-10 ${isConnected ? 'text-green-500' : 'text-red-500'}`}
+        >
           Connection
         </p>
         <Router routes={routes} fallback={<NotFound />} />

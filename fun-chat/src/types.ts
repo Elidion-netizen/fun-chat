@@ -6,7 +6,7 @@ export type WebSocketHook = {
   currentUser: { current: UserData | null };
   userlist: User[];
   messages: MessageState;
-  talker: { current: string | null };
+  talker: { current: User | null };
 };
 
 export type SocketMessage = {

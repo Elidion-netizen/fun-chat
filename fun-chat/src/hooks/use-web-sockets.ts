@@ -24,7 +24,7 @@ export function useWebSockets(): WebSocketHook {
   const [messages, setMessages] = React.useState<MessageState>({});
   const socketRef = React.useRef<WebSocket | null>(null);
   const idRef = React.useRef<string | null>(null);
-  const talker = React.useRef<string | null>(null);
+  const talker = React.useRef<User | null>(null);
   const currentUser = React.useRef<UserData | null>(null);
 
   const connect = React.useCallback(() => {
@@ -95,7 +95,7 @@ export function useWebSockets(): WebSocketHook {
         const login = talker.current;
         if (!login) return;
         setMessages((prev) => {
-          return { ...prev, [login]: data.payload.messages };
+          return { ...prev, [login.login]: data.payload.messages };
         });
       }
 
