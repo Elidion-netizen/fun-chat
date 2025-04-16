@@ -1,14 +1,14 @@
 import React from '@/react';
 import { Router } from '@react/router';
-import { NotFound } from './pages/not-found';
-import { Login } from './pages/login';
-import { Chat } from './pages/chat';
+import { NotFound } from './pages/not-found-page';
+import { Login } from './pages/login-page';
+import { ChatPage } from './pages/chat-page';
 import { useWebSockets } from './hooks/use-web-sockets';
 import type { WebSocketHook } from './types';
 
 const routes = [
   { path: '/', component: <Login /> },
-  { path: '/chat', component: <Chat /> },
+  { path: '/chat', component: <ChatPage /> },
 ];
 
 export const Context = React.createContext<WebSocketHook>();
