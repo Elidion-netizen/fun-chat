@@ -30,7 +30,7 @@ export function useState<S>(
   global_object.hookIndex += 1;
 
   const setState = (value: S | ((value: S) => S)): void => {
-    const newState = transformState(value, hook.state);
+    const newState = transformState(value, hook.queue.at(-1) || hook.state);
     hook.queue.push(newState);
 
     scheduleUpdate();

@@ -41,32 +41,26 @@ export function Messages(): React.JSX.Element {
                       {new Date(el.datetime).toLocaleTimeString()}
                     </span>
                   </div>
-                  <span
-                    className={`text-xs font-medium ${
-                      el.status.isDelivered
-                        ? el.from === currentUser.current?.login
+                  {el.from === currentUser.current?.login && (
+                    <span
+                      className={`text-xs font-medium ${
+                        el.status.isDelivered
                           ? 'text-green-300'
-                          : 'text-green-600'
-                        : el.from === currentUser.current?.login
-                          ? 'text-yellow-200'
-                          : 'text-yellow-600'
-                    }`}
-                  >
-                    {el.status.isDelivered ? 'Delivered' : 'Sending...'}
-                  </span>
+                          : 'text-yellow-200'
+                      }`}
+                    >
+                      {el.status.isDelivered ? 'Delivered' : 'Sending...'}
+                    </span>
+                  )}
                 </div>
               </div>
               <p className="break-words pr-8">{el.text}</p>
               <div className="flex justify-end mt-2 text-xs">
-                <span
-                  className={`${
-                    el.from === currentUser.current?.login
-                      ? 'text-white/70'
-                      : 'text-gray-400'
-                  }`}
-                >
-                  {el.status.isReaded ? 'Read' : 'Unread'}
-                </span>
+                {el.from === currentUser.current?.login && (
+                  <span className="text-white/70">
+                    {el.status.isReaded ? 'Read' : 'Unread'}
+                  </span>
+                )}
               </div>
             </div>
           </div>

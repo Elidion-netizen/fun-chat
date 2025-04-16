@@ -31,7 +31,6 @@ export function useWebSockets(): WebSocketHook {
     if (socketRef.current) return;
 
     const ws = new WebSocket('ws://localhost:4000');
-    let users: User[] = [];
 
     ws.onopen = (): void => {
       setIsConnected(true);
@@ -58,13 +57,11 @@ export function useWebSockets(): WebSocketHook {
       }
 
       if (isAuthUsersResponse(data)) {
-        users.push(...data.payload.users);
-        setUserlist(users);
+        setUserlist((pre) => [...pre, ...data.payload.users]);
       }
 
       if (isUnauthUsersResponse(data)) {
-        users.push(...data.payload.users);
-        setUserlist(users);
+        setUserlist((pre) => [...pre, ...data.payload.users]);
       }
 
       if (isUserActive(data)) {
@@ -128,7 +125,6 @@ export function useWebSockets(): WebSocketHook {
       if (isUserLogoutResponse(data)) {
         const isLog = data.payload.user.isLogined;
         if (!isLog) {
-          users = [];
           navigate('/');
           setUserlist([]);
         }
