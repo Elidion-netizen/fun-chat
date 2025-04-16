@@ -4,8 +4,8 @@ import { UserList } from '@/components/list-of-users';
 import React from '@/react';
 import type { User } from '@/types';
 export function ChatPage(): React.JSX.Element {
-  const { sendMessage, currentUser, userlist, talker } =
-    React.useContext(Context);
+  const { sendMessage, currentUser, userlist } = React.useContext(Context);
+  const [talker, setTalker] = React.useState<User | null>(null);
 
   function logout(): void {
     if (!currentUser.current) return;
@@ -16,12 +16,7 @@ export function ChatPage(): React.JSX.Element {
   }
 
   function activateChat(user: User): void {
-    if (currentUser.current?.login === user.login) return;
-    sendMessage({
-      type: 'MSG_FROM_USER',
-      payload: { user: { login: user.login } },
-    });
-    talker.current = user;
+    setTalker(user);
   }
 
   return (
@@ -32,7 +27,7 @@ export function ChatPage(): React.JSX.Element {
         userlist={userlist}
       />
 
-      <Chat />
+      <Chat talker={talker} />
 
       <button className="absolute top-5 right-5" onClick={() => logout()}>
         Logout

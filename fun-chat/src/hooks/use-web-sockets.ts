@@ -12,8 +12,7 @@ import {
   isAuthUsersResponse,
   isMessage,
   isUnauthUsersResponse,
-  isUserActive,
-  isUserInactive,
+  isActiveUser,
   isUserLoginResponse,
   isUserLogoutResponse,
 } from '@/validators';
@@ -24,8 +23,8 @@ export function useWebSockets(): WebSocketHook {
   const [messages, setMessages] = React.useState<MessageState>({});
   const socketRef = React.useRef<WebSocket | null>(null);
   const idRef = React.useRef<string | null>(null);
-  const talker = React.useRef<User | null>(null);
   const currentUser = React.useRef<UserData | null>(null);
+  const usersQueue = React.useRef<User[]>([]);
 
   const connect = React.useCallback(() => {
     if (socketRef.current) return;
@@ -58,25 +57,33 @@ export function useWebSockets(): WebSocketHook {
 
       if (isAuthUsersResponse(data)) {
         setUserlist((pre) => [...pre, ...data.payload.users]);
+        for (const user of data.payload.users) {
+          if (user.login === currentUser.current?.login) {
+            continue;
+          }
+          usersQueue.current?.push(user);
+          sendMessage({
+            type: 'MSG_FROM_USER',
+            payload: { user: { login: user.login } },
+          });
+        }
       }
 
       if (isUnauthUsersResponse(data)) {
         setUserlist((pre) => [...pre, ...data.payload.users]);
-      }
-
-      if (isUserActive(data)) {
-        setUserlist((pre) => {
-          const user = data.payload.user;
-          if (!pre.some((el) => el.login === user.login)) {
-            return [...pre, user];
+        for (const user of data.payload.users) {
+          if (user.login === currentUser.current?.login) {
+            continue;
           }
-          return pre.map((element) =>
-            element.login === user.login ? data.payload.user : element
-          );
-        });
+          usersQueue.current?.push(user);
+          sendMessage({
+            type: 'MSG_FROM_USER',
+            payload: { user: { login: user.login } },
+          });
+        }
       }
 
-      if (isUserInactive(data)) {
+      if (isActiveUser(data)) {
         setUserlist((pre) => {
           const user = data.payload.user;
           if (!pre.some((el) => el.login === user.login)) {
@@ -89,7 +96,7 @@ export function useWebSockets(): WebSocketHook {
       }
 
       if (isAllMessages(data)) {
-        const login = talker.current;
+        const login = usersQueue.current?.shift();
         if (!login) return;
         setMessages((prev) => {
           return { ...prev, [login.login]: data.payload.messages };
@@ -194,6 +201,5 @@ export function useWebSockets(): WebSocketHook {
     currentUser,
     userlist,
     messages,
-    talker,
   };
 }

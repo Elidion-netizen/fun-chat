@@ -1,15 +1,20 @@
 import { Context } from '@/app';
 import React from '@/react';
+import type { User } from '@/types';
 
-export function Messages(): React.JSX.Element {
-  const { currentUser, messages, talker } = React.useContext(Context);
+export function Messages({
+  talker,
+}: {
+  talker: User | null;
+}): React.JSX.Element {
+  const { currentUser, messages } = React.useContext(Context);
 
   return (
     <div className="flex-1 p-4 overflow-y-auto bg-white">
-      {talker.current !== null &&
-        `${talker.current.login}` in messages &&
-        messages[talker.current.login].length > 0 &&
-        messages[talker.current.login].map((el) => (
+      {talker !== null &&
+        `${talker.login}` in messages &&
+        messages[talker.login].length > 0 &&
+        messages[talker.login].map((el) => (
           <div
             key={el.id}
             className={`flex ${

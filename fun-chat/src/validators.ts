@@ -36,19 +36,12 @@ export function isUnauthUsersResponse(data: unknown): data is InactiveUsers {
   return validUsers(data) && data.type === 'USER_INACTIVE';
 }
 
-export function isUserActive(data: unknown): data is UserActivate {
+export function isActiveUser(data: unknown): data is UserActivate {
   return (
     validUserResponse(data) &&
     data.id === null &&
-    data.type === 'USER_EXTERNAL_LOGIN'
-  );
-}
-
-export function isUserInactive(data: unknown): data is UserActivate {
-  return (
-    validUserResponse(data) &&
-    data.id === null &&
-    data.type === 'USER_EXTERNAL_LOGOUT'
+    (data.type === 'USER_EXTERNAL_LOGIN' ||
+      data.type === 'USER_EXTERNAL_LOGOUT')
   );
 }
 
