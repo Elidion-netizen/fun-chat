@@ -15,11 +15,11 @@ import type { MessageAction, SocketMessage, User, UserData } from '@/types';
 
 export function messageManager(
   data: unknown,
-  pendingMessagesMap: {
+  pendingMessagesMapRef: {
     current: Map<string, string> | null;
   },
   sendMessage: (message: SocketMessage) => void,
-  currentUser: {
+  currentUserRef: {
     current: UserData | null;
   },
   dispatchMessages: (action: MessageAction) => void,
@@ -39,7 +39,7 @@ export function messageManager(
       if (!isLog) {
         return;
       }
-      const userDataString = pendingMessagesMap.current?.get(data.id);
+      const userDataString = pendingMessagesMapRef.current?.get(data.id);
       if (!userDataString) {
         return;
       }
@@ -47,10 +47,10 @@ export function messageManager(
 
       if (isUser(userData)) {
         authService.signIn(userData);
-        currentUser.current = userData;
+        currentUserRef.current = userData;
       }
 
-      pendingMessagesMap.current?.delete(data.id);
+      pendingMessagesMapRef.current?.delete(data.id);
       navigate('/chat');
       getUsersList(sendMessage);
 
@@ -60,7 +60,7 @@ export function messageManager(
     case 'USER_INACTIVE': {
       if (!isAuthUsersResponse(data)) return;
       const users = data.payload.users.filter(
-        (user) => user.login !== currentUser.current?.login
+        (user) => user.login !== currentUserRef.current?.login
       );
 
       addUsers(users);
@@ -78,9 +78,9 @@ export function messageManager(
     }
     case 'MSG_FROM_USER': {
       if (isAllMessages(data)) {
-        const login = pendingMessagesMap.current?.get(data.id);
+        const login = pendingMessagesMapRef.current?.get(data.id);
 
-        pendingMessagesMap.current?.delete(data.id);
+        pendingMessagesMapRef.current?.delete(data.id);
 
         if (!login) return;
         dispatchMessages({
@@ -93,7 +93,7 @@ export function messageManager(
     }
     case 'MSG_SEND': {
       if (!isMessage(data)) return;
-      const user = currentUser.current?.login;
+      const user = currentUserRef.current?.login;
       if (!user) return;
       if (data.payload.message.from === user) {
         dispatchMessages({
@@ -115,7 +115,7 @@ export function messageManager(
       const isLog = data.payload.user.isLogined;
       if (!isLog) {
         authService.signOut();
-        currentUser.current = null;
+        currentUserRef.current = null;
         navigate('/');
         clearUsers();
       }

@@ -3,7 +3,7 @@ export type WebSocketHook = {
   sendMessage: (message: SocketMessage) => void;
   disconnect: () => void;
   isConnected: boolean;
-  currentUser: { current: UserData | null };
+  currentUserRef: { current: UserData | null };
   userlist: User[];
   messages: MessageState;
 };

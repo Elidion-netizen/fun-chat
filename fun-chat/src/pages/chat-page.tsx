@@ -4,14 +4,14 @@ import { UserList } from '@/components/list-of-users';
 import React from '@/react';
 import type { User } from '@/types';
 export function ChatPage(): React.JSX.Element {
-  const { sendMessage, currentUser, userlist } = React.useContext(Context);
+  const { sendMessage, currentUserRef, userlist } = React.useContext(Context);
   const [talker, setTalker] = React.useState<User | null>(null);
 
   function logout(): void {
-    if (!currentUser.current) return;
+    if (!currentUserRef.current) return;
     sendMessage({
       type: 'USER_LOGOUT',
-      payload: { user: currentUser.current },
+      payload: { user: currentUserRef.current },
     });
   }
 
@@ -22,7 +22,7 @@ export function ChatPage(): React.JSX.Element {
   return (
     <section className="flex h-full relative">
       <UserList
-        currentUser={currentUser.current?.login}
+        currentUser={currentUserRef.current?.login}
         activateChat={activateChat}
         userlist={userlist}
       />

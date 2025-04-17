@@ -9,9 +9,11 @@ export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [userlist, setUserlist] = React.useState<User[]>([]);
   const [messages, dispatchMessages] = React.useReducer(messagesReducer, {});
+
+  const intervalRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const socketRef = React.useRef<WebSocket | null>(null);
-  const currentUser = React.useRef<UserData | null>(authService.getUser());
-  const pendingMessagesMap = React.useRef<Map<string, string>>(
+  const currentUserRef = React.useRef<UserData | null>(authService.getUser());
+  const pendingMessagesMapRef = React.useRef<Map<string, string>>(
     new Map<string, string>()
   );
 
@@ -41,11 +43,12 @@ export function useWebSockets(): WebSocketHook {
 
     ws.onopen = (): void => {
       setIsConnected(true);
+      intervalRef.current = null;
       socketRef.current = ws;
-      if (currentUser.current !== null) {
+      if (currentUserRef.current !== null) {
         sendMessage({
           type: 'USER_LOGIN',
-          payload: { user: currentUser.current },
+          payload: { user: currentUserRef.current },
         });
       }
     };
@@ -56,9 +59,9 @@ export function useWebSockets(): WebSocketHook {
 
       messageManager(
         data,
-        pendingMessagesMap,
+        pendingMessagesMapRef,
         sendMessage,
-        currentUser,
+        currentUserRef,
         dispatchMessages,
         addUser,
         addUsers,
@@ -69,6 +72,9 @@ export function useWebSockets(): WebSocketHook {
     ws.onclose = (): void => {
       setIsConnected(false);
       socketRef.current = null;
+      if (ws) {
+        intervalRef.current = setInterval(() => connect(), 1000);
+      }
     };
 
     ws.onerror = (error): void => {
@@ -86,10 +92,10 @@ export function useWebSockets(): WebSocketHook {
       };
 
       if (isGetHistoryMessage(message)) {
-        pendingMessagesMap.current?.set(id, message.payload.user.login);
+        pendingMessagesMapRef.current?.set(id, message.payload.user.login);
       }
       if (isAuthMessage(message)) {
-        pendingMessagesMap.current?.set(
+        pendingMessagesMapRef.current?.set(
           id,
           JSON.stringify(message.payload.user)
         );
@@ -110,6 +116,7 @@ export function useWebSockets(): WebSocketHook {
   const disconnect = React.useCallback(() => {
     if (socketRef.current) {
       socketRef.current.close();
+      socketRef.current = null;
     }
   }, [socketRef.current]);
 
@@ -118,7 +125,7 @@ export function useWebSockets(): WebSocketHook {
     sendMessage,
     disconnect,
     isConnected,
-    currentUser,
+    currentUserRef,
     userlist,
     messages,
   };

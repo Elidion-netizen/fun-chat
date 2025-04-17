@@ -7,7 +7,7 @@ export function Messages({
 }: {
   talker: User | null;
 }): React.JSX.Element {
-  const { currentUser, messages } = React.useContext(Context);
+  const { currentUserRef, messages } = React.useContext(Context);
 
   return (
     <div className="flex-1 p-4 overflow-y-auto bg-white">
@@ -18,14 +18,14 @@ export function Messages({
           <div
             key={el.id}
             className={`flex ${
-              el.from === currentUser.current?.login
+              el.from === currentUserRef.current?.login
                 ? 'justify-end'
                 : 'justify-start'
             } mb-4`}
           >
             <div
               className={`relative max-w-xs rounded-lg px-3 pt-3 pb-6 shadow-md ${
-                el.from === currentUser.current?.login
+                el.from === currentUserRef.current?.login
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-black'
               }`}
@@ -33,12 +33,14 @@ export function Messages({
               <div className="flex items-center justify-between mb-2 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">
-                    {el.from === currentUser.current?.login ? 'You' : el.from}
+                    {el.from === currentUserRef.current?.login
+                      ? 'You'
+                      : el.from}
                   </span>
                   <div className="flex gap-2 items-center">
                     <span
                       className={`text-xs ${
-                        el.from === currentUser.current?.login
+                        el.from === currentUserRef.current?.login
                           ? 'text-white/70'
                           : 'text-gray-400'
                       }`}
@@ -46,7 +48,7 @@ export function Messages({
                       {new Date(el.datetime).toLocaleTimeString()}
                     </span>
                   </div>
-                  {el.from === currentUser.current?.login && (
+                  {el.from === currentUserRef.current?.login && (
                     <span
                       className={`text-xs font-medium ${
                         el.status.isDelivered
@@ -61,7 +63,7 @@ export function Messages({
               </div>
               <p className="break-words pr-8">{el.text}</p>
               <div className="flex justify-end mt-2 text-xs">
-                {el.from === currentUser.current?.login && (
+                {el.from === currentUserRef.current?.login && (
                   <span className="text-white/70">
                     {el.status.isReaded ? 'Read' : 'Unread'}
                   </span>

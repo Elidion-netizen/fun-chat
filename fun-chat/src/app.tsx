@@ -29,7 +29,7 @@ export function App(): React.JSX.Element {
     sendMessage,
     disconnect,
     isConnected,
-    currentUser,
+    currentUserRef,
     userlist,
     messages,
   } = useWebSockets();
@@ -46,7 +46,7 @@ export function App(): React.JSX.Element {
           sendMessage,
           disconnect,
           isConnected,
-          currentUser,
+          currentUserRef,
           userlist,
           messages,
         }}
