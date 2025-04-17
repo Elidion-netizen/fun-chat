@@ -13,6 +13,21 @@ export type SocketMessage = {
   payload: Record<string, unknown> | null;
 };
 
+export type AuthMessage = SocketMessage & {
+  type: 'USER_LOGIN';
+  payload: {
+    user: {
+      password: string;
+      login: string;
+    };
+  };
+};
+
+export type GetHistoryMessage = SocketMessage & {
+  type: 'MSG_FROM_USER';
+  payload: { user: { login: string } };
+};
+
 export type LoginResponse = ResponseData & { id: string; type: 'USER_LOGIN' };
 
 export type LogoutResponse = ResponseData & { id: string; type: 'USER_LOGOUT' };
@@ -70,12 +85,13 @@ export type AllUsers = {
 };
 
 export type MessageResponse = {
-  id: null;
+  id: string | null;
   type: 'MSG_SEND' | 'MSG_FROM_USER';
   payload: Record<string, unknown>;
 };
 
 export type AllMessages = MessageResponse & {
+  id: string;
   type: 'MSG_FROM_USER';
   payload: {
     messages: Message[];

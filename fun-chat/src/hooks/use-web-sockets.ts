@@ -15,6 +15,8 @@ import {
   isActiveUser,
   isUserLoginResponse,
   isUserLogoutResponse,
+  isAuthMessage,
+  isGetHistoryMessage,
 } from '@/validators';
 
 export function useWebSockets(): WebSocketHook {
@@ -22,9 +24,8 @@ export function useWebSockets(): WebSocketHook {
   const [userlist, setUserlist] = React.useState<User[]>([]);
   const [messages, setMessages] = React.useState<MessageState>({});
   const socketRef = React.useRef<WebSocket | null>(null);
-  const idRef = React.useRef<string | null>(null);
   const currentUser = React.useRef<UserData | null>(null);
-  const usersQueue = React.useRef<User[]>([]);
+  const usersMap = React.useRef<Map<string, string>>(new Map<string, string>());
 
   const connect = React.useCallback(() => {
     if (socketRef.current) return;
@@ -61,7 +62,6 @@ export function useWebSockets(): WebSocketHook {
           if (user.login === currentUser.current?.login) {
             continue;
           }
-          usersQueue.current?.push(user);
           sendMessage({
             type: 'MSG_FROM_USER',
             payload: { user: { login: user.login } },
@@ -75,7 +75,6 @@ export function useWebSockets(): WebSocketHook {
           if (user.login === currentUser.current?.login) {
             continue;
           }
-          usersQueue.current?.push(user);
           sendMessage({
             type: 'MSG_FROM_USER',
             payload: { user: { login: user.login } },
@@ -96,10 +95,13 @@ export function useWebSockets(): WebSocketHook {
       }
 
       if (isAllMessages(data)) {
-        const login = usersQueue.current?.shift();
+        const login = usersMap.current?.get(data.id);
+
+        usersMap.current?.delete(data.id);
+
         if (!login) return;
         setMessages((prev) => {
-          return { ...prev, [login.login]: data.payload.messages };
+          return { ...prev, [login]: data.payload.messages };
         });
       }
 
@@ -111,7 +113,7 @@ export function useWebSockets(): WebSocketHook {
             return {
               ...pre,
               [data.payload.message.to]: [
-                ...pre[data.payload.message.to],
+                ...(pre[data.payload.message.to] || []),
                 data.payload.message,
               ],
             };
@@ -121,7 +123,7 @@ export function useWebSockets(): WebSocketHook {
             return {
               ...pre,
               [data.payload.message.from]: [
-                ...pre[data.payload.message.from],
+                ...(pre[data.payload.message.from] || []),
                 data.payload.message,
               ],
             };
@@ -150,20 +152,9 @@ export function useWebSockets(): WebSocketHook {
 
   const sendMessage = React.useCallback(
     (message: SocketMessage): void => {
-      if (!idRef.current) {
-        idRef.current = crypto.randomUUID();
-      }
-      if (
-        message.payload !== null &&
-        message.type === 'USER_LOGIN' &&
-        message.payload.user &&
-        typeof message.payload.user === 'object' &&
-        message.payload.user !== null &&
-        'login' in message.payload.user &&
-        'password' in message.payload.user &&
-        typeof message.payload.user.login === 'string' &&
-        typeof message.payload.user.password === 'string'
-      ) {
+      const id = crypto.randomUUID();
+
+      if (isAuthMessage(message)) {
         currentUser.current = {
           login: message.payload.user.login,
           password: message.payload.user.password,
@@ -172,8 +163,12 @@ export function useWebSockets(): WebSocketHook {
 
       const data = {
         ...message,
-        id: idRef.current,
+        id,
       };
+
+      if (isGetHistoryMessage(message)) {
+        usersMap.current?.set(id, message.payload.user.login);
+      }
 
       if (
         socketRef.current &&

@@ -10,6 +10,9 @@ import type {
   AllMessages,
   SingleMessage,
   MessageResponse,
+  AuthMessage,
+  SocketMessage,
+  GetHistoryMessage,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -54,6 +57,34 @@ export function isAllMessages(data: unknown): data is AllMessages {
     Array.isArray(data.payload.messages) &&
     (data.payload.messages.length === 0 ||
       validMessage(data.payload.messages[0]))
+  );
+}
+
+export function isAuthMessage(data: SocketMessage): data is AuthMessage {
+  return (
+    data.payload !== null &&
+    data.type === 'USER_LOGIN' &&
+    'user' in data.payload &&
+    typeof data.payload.user === 'object' &&
+    data.payload.user !== null &&
+    'login' in data.payload.user &&
+    'password' in data.payload.user &&
+    typeof data.payload.user.login === 'string' &&
+    typeof data.payload.user.password === 'string'
+  );
+}
+
+export function isGetHistoryMessage(
+  data: SocketMessage
+): data is GetHistoryMessage {
+  return (
+    data.payload !== null &&
+    data.type === 'MSG_FROM_USER' &&
+    'user' in data.payload &&
+    typeof data.payload.user === 'object' &&
+    data.payload.user !== null &&
+    'login' in data.payload.user &&
+    typeof data.payload.user.login === 'string'
   );
 }
 
