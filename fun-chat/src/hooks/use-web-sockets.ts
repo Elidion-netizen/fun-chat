@@ -10,7 +10,6 @@ export function useWebSockets(): WebSocketHook {
   const [userlist, setUserlist] = React.useState<User[]>([]);
   const [messages, dispatchMessages] = React.useReducer(messagesReducer, {});
 
-  const intervalRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const socketRef = React.useRef<WebSocket | null>(null);
   const currentUserRef = React.useRef<UserData | null>(authService.getUser());
   const pendingMessagesMapRef = React.useRef<Map<string, string>>(
@@ -43,8 +42,9 @@ export function useWebSockets(): WebSocketHook {
 
     ws.onopen = (): void => {
       setIsConnected(true);
-      intervalRef.current = null;
+
       socketRef.current = ws;
+      console.log('open');
       if (currentUserRef.current !== null) {
         sendMessage({
           type: 'USER_LOGIN',
@@ -72,9 +72,8 @@ export function useWebSockets(): WebSocketHook {
     ws.onclose = (): void => {
       setIsConnected(false);
       socketRef.current = null;
-      if (ws) {
-        intervalRef.current = setInterval(() => connect(), 1000);
-      }
+      clearUsers();
+      connect();
     };
 
     ws.onerror = (error): void => {

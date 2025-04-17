@@ -33,23 +33,20 @@ export function messageManager(
   }
   switch (data.type) {
     case 'USER_LOGIN': {
-      if (!isUserLoginResponse(data)) {
-        return;
-      }
+      if (!isUserLoginResponse(data)) return;
+
       const isLog = data.payload.user.isLogined;
-      if (!isLog) {
-        return;
-      }
+      if (!isLog) return;
+
       const userDataString = pendingMessagesMapRef.current?.get(data.id);
-      if (!userDataString) {
-        return;
-      }
+      if (!userDataString) return;
+
       const userData: unknown = JSON.parse(userDataString);
 
-      if (isUser(userData)) {
-        authService.signIn(userData);
-        currentUserRef.current = userData;
-      }
+      if (!isUser(userData)) return;
+
+      authService.signIn(userData);
+      currentUserRef.current = userData;
 
       pendingMessagesMapRef.current?.delete(data.id);
       navigate('/chat');
@@ -60,6 +57,7 @@ export function messageManager(
     case 'USER_ACTIVE':
     case 'USER_INACTIVE': {
       if (!isAuthUsersResponse(data)) return;
+
       const users = data.payload.users.filter(
         (user) => user.login !== currentUserRef.current?.login
       );
@@ -78,24 +76,27 @@ export function messageManager(
       break;
     }
     case 'MSG_FROM_USER': {
-      if (isAllMessages(data)) {
-        const login = pendingMessagesMapRef.current?.get(data.id);
+      if (!isAllMessages(data)) return;
 
-        pendingMessagesMapRef.current?.delete(data.id);
+      const login = pendingMessagesMapRef.current?.get(data.id);
 
-        if (!login) return;
-        dispatchMessages({
-          type: 'SET_ALL_MESSAGES',
-          login,
-          messages: data.payload.messages,
-        });
-      }
+      pendingMessagesMapRef.current?.delete(data.id);
+      if (!login) return;
+
+      dispatchMessages({
+        type: 'SET_ALL_MESSAGES',
+        login,
+        messages: data.payload.messages,
+      });
+
       break;
     }
     case 'MSG_SEND': {
       if (!isMessage(data)) return;
+
       const user = currentUserRef.current?.login;
       if (!user) return;
+
       if (data.payload.message.from === user) {
         dispatchMessages({
           type: 'ADD_MESSAGE',
@@ -113,9 +114,8 @@ export function messageManager(
     }
     case 'MSG_DELIVER':
     case 'MSG_READ': {
-      if (!validUpdateMessage(data)) {
-        return;
-      }
+      if (!validUpdateMessage(data)) return;
+
       dispatchMessages({
         type: 'UPDATE_MESSAGE',
         message: data.payload.message,
@@ -124,6 +124,7 @@ export function messageManager(
     }
     case 'USER_LOGOUT': {
       if (!isUserLogoutResponse(data)) return;
+
       const isLog = data.payload.user.isLogined;
       if (!isLog) {
         authService.signOut();
