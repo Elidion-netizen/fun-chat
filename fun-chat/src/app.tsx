@@ -5,10 +5,21 @@ import { Login } from './pages/login-page';
 import { ChatPage } from './pages/chat-page';
 import { useWebSockets } from './hooks/use-web-sockets';
 import type { WebSocketHook } from './types';
+import { AuthGuard } from './helpers/auth-guard';
 
 const routes = [
-  { path: '/', component: <Login /> },
-  { path: '/chat', component: <ChatPage /> },
+  {
+    path: '/',
+    guard: (): boolean => !AuthGuard(),
+    redirectTo: '/chat',
+    component: <Login />,
+  },
+  {
+    path: '/chat',
+    guard: (): boolean => AuthGuard(),
+    redirectTo: '/',
+    component: <ChatPage />,
+  },
 ];
 
 export const Context = React.createContext<WebSocketHook>();

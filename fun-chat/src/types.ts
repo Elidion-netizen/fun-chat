@@ -72,10 +72,6 @@ export type UserData = {
   password: string;
 };
 
-export type ActiveUsers = AllUsers & { type: 'USER_ACTIVE' };
-
-export type InactiveUsers = AllUsers & { type: 'USER_INACTIVE' };
-
 export type AllUsers = {
   id: string;
   type: 'USER_ACTIVE' | 'USER_INACTIVE';
@@ -86,7 +82,7 @@ export type AllUsers = {
 
 export type MessageResponse = {
   id: string | null;
-  type: 'MSG_SEND' | 'MSG_FROM_USER';
+  type: string;
   payload: Record<string, unknown>;
 };
 
@@ -119,3 +115,7 @@ export type Message = {
     isEdited: boolean;
   };
 };
+
+export type MessageAction =
+  | { type: 'SET_ALL_MESSAGES'; login: string; messages: Message[] }
+  | { type: 'ADD_MESSAGE'; login: string; message: Message };

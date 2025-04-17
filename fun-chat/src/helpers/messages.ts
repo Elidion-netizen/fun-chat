@@ -1,4 +1,4 @@
-import type { SocketMessage } from '@/types';
+import type { SocketMessage, User } from '@/types';
 
 export function getUsersList(
   sendMessage: (message: SocketMessage) => void
@@ -15,10 +15,16 @@ export function getUsersList(
 
 export function getUserMessages(
   sendMessage: (message: SocketMessage) => void,
-  login: string
+  currentUser: string | undefined,
+  users: User[]
 ): void {
-  sendMessage({
-    type: 'MSG_FROM_USER',
-    payload: { user: { login } },
-  });
+  for (const user of users) {
+    if (user.login === currentUser) {
+      continue;
+    }
+    sendMessage({
+      type: 'MSG_FROM_USER',
+      payload: { user: { login: user.login } },
+    });
+  }
 }

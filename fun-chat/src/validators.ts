@@ -1,7 +1,5 @@
 import type {
-  ActiveUsers,
   AllUsers,
-  InactiveUsers,
   LoginResponse,
   ResponseData,
   LogoutResponse,
@@ -13,6 +11,7 @@ import type {
   AuthMessage,
   SocketMessage,
   GetHistoryMessage,
+  UserData,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -31,12 +30,11 @@ export function isUserLogoutResponse(data: unknown): data is LogoutResponse {
   );
 }
 
-export function isAuthUsersResponse(data: unknown): data is ActiveUsers {
-  return validUsers(data) && data.type === 'USER_ACTIVE';
-}
-
-export function isUnauthUsersResponse(data: unknown): data is InactiveUsers {
-  return validUsers(data) && data.type === 'USER_INACTIVE';
+export function isAuthUsersResponse(data: unknown): data is AllUsers {
+  return (
+    validUsers(data) &&
+    (data.type === 'USER_ACTIVE' || data.type === 'USER_INACTIVE')
+  );
 }
 
 export function isActiveUser(data: unknown): data is UserActivate {
@@ -94,6 +92,17 @@ export function isMessage(data: unknown): data is SingleMessage {
     data.type === 'MSG_SEND' &&
     'message' in data.payload &&
     validMessage(data.payload.message)
+  );
+}
+
+export function isUser(user: unknown): user is UserData {
+  return (
+    typeof user === 'object' &&
+    user !== null &&
+    'login' in user &&
+    'password' in user &&
+    typeof user.login === 'string' &&
+    typeof user.password === 'string'
   );
 }
 
@@ -157,7 +166,9 @@ const validMessage = (data: unknown): data is Message => {
   );
 };
 
-const validMessageResponse = (data: unknown): data is MessageResponse => {
+export const validMessageResponse = (
+  data: unknown
+): data is MessageResponse => {
   return (
     typeof data === 'object' &&
     data !== null &&

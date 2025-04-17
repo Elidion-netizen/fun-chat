@@ -1,32 +1,32 @@
-import { getUserMessages, getUsersList } from '@/helpers/messages';
+import { messagesReducer } from '@/helpers/reducer';
+import { authService } from '@/services/local-storage.service';
 import React from '@/react';
-import { navigate } from '@/react/router';
-import type {
-  MessageState,
-  SocketMessage,
-  User,
-  UserData,
-  WebSocketHook,
-} from '@/types';
-import {
-  isAllMessages,
-  isAuthUsersResponse,
-  isMessage,
-  isUnauthUsersResponse,
-  isActiveUser,
-  isUserLoginResponse,
-  isUserLogoutResponse,
-  isAuthMessage,
-  isGetHistoryMessage,
-} from '@/validators';
+import type { SocketMessage, User, UserData, WebSocketHook } from '@/types';
+import { isAuthMessage, isGetHistoryMessage } from '@/validators';
+import { messageManager } from '@/services/message-manager.service';
 
 export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [userlist, setUserlist] = React.useState<User[]>([]);
-  const [messages, setMessages] = React.useState<MessageState>({});
+  const [messages, dispatchMessages] = React.useReducer(messagesReducer, {});
   const socketRef = React.useRef<WebSocket | null>(null);
-  const currentUser = React.useRef<UserData | null>(null);
+  const currentUser = React.useRef<UserData | null>(authService.getUser());
   const usersMap = React.useRef<Map<string, string>>(new Map<string, string>());
+
+  const addUser = (user: User): void => {
+    setUserlist((pre) => {
+      if (!pre.some((el) => el.login === user.login)) {
+        return [...pre, user];
+      }
+      return pre.map((element) =>
+        element.login === user.login ? user : element
+      );
+    });
+  };
+
+  const addUsers = (data: User[]): void => {
+    setUserlist((pre) => [...pre, ...data]);
+  };
 
   const connect = React.useCallback(() => {
     if (socketRef.current) return;
@@ -36,98 +36,27 @@ export function useWebSockets(): WebSocketHook {
     ws.onopen = (): void => {
       setIsConnected(true);
       socketRef.current = ws;
+      if (currentUser.current !== null) {
+        sendMessage({
+          type: 'USER_LOGIN',
+          payload: { user: currentUser.current },
+        });
+      }
     };
 
     ws.onmessage = (message): void => {
       if (typeof message.data !== 'string') return;
       const data: unknown = JSON.parse(message.data);
 
-      if (isUserLoginResponse(data)) {
-        const isLog = data.payload.user.isLogined;
-        if (isLog) {
-          navigate('/chat');
-          getUsersList(sendMessage);
-        } else {
-          currentUser.current = null;
-        }
-      }
-
-      if (isAuthUsersResponse(data)) {
-        setUserlist((pre) => [...pre, ...data.payload.users]);
-        for (const user of data.payload.users) {
-          if (user.login === currentUser.current?.login) {
-            continue;
-          }
-          getUserMessages(sendMessage, user.login);
-        }
-      }
-
-      if (isUnauthUsersResponse(data)) {
-        setUserlist((pre) => [...pre, ...data.payload.users]);
-        for (const user of data.payload.users) {
-          if (user.login === currentUser.current?.login) {
-            continue;
-          }
-          getUserMessages(sendMessage, user.login);
-        }
-      }
-
-      if (isActiveUser(data)) {
-        setUserlist((pre) => {
-          const user = data.payload.user;
-          if (!pre.some((el) => el.login === user.login)) {
-            return [...pre, user];
-          }
-          return pre.map((element) =>
-            element.login === user.login ? data.payload.user : element
-          );
-        });
-      }
-
-      if (isAllMessages(data)) {
-        const login = usersMap.current?.get(data.id);
-
-        usersMap.current?.delete(data.id);
-
-        if (!login) return;
-        setMessages((prev) => {
-          return { ...prev, [login]: data.payload.messages };
-        });
-      }
-
-      if (isMessage(data)) {
-        const user = currentUser.current?.login;
-        if (!user) return;
-        if (data.payload.message.from === user) {
-          setMessages((pre) => {
-            return {
-              ...pre,
-              [data.payload.message.to]: [
-                ...(pre[data.payload.message.to] || []),
-                data.payload.message,
-              ],
-            };
-          });
-        } else {
-          setMessages((pre) => {
-            return {
-              ...pre,
-              [data.payload.message.from]: [
-                ...(pre[data.payload.message.from] || []),
-                data.payload.message,
-              ],
-            };
-          });
-        }
-      }
-
-      if (isUserLogoutResponse(data)) {
-        const isLog = data.payload.user.isLogined;
-        if (!isLog) {
-          navigate('/');
-          setUserlist([]);
-        }
-      }
+      messageManager(
+        data,
+        usersMap,
+        sendMessage,
+        currentUser,
+        dispatchMessages,
+        addUser,
+        addUsers
+      );
     };
 
     ws.onclose = (): void => {
@@ -144,13 +73,6 @@ export function useWebSockets(): WebSocketHook {
     (message: SocketMessage): void => {
       const id = crypto.randomUUID();
 
-      if (isAuthMessage(message)) {
-        currentUser.current = {
-          login: message.payload.user.login,
-          password: message.payload.user.password,
-        };
-      }
-
       const data = {
         ...message,
         id,
@@ -158,6 +80,9 @@ export function useWebSockets(): WebSocketHook {
 
       if (isGetHistoryMessage(message)) {
         usersMap.current?.set(id, message.payload.user.login);
+      }
+      if (isAuthMessage(message)) {
+        usersMap.current?.set(id, JSON.stringify(message.payload.user));
       }
 
       if (
