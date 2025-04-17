@@ -15,7 +15,7 @@ import type { MessageAction, SocketMessage, User, UserData } from '@/types';
 
 export function messageManager(
   data: unknown,
-  usersMap: {
+  pendingMessagesMap: {
     current: Map<string, string> | null;
   },
   sendMessage: (message: SocketMessage) => void,
@@ -24,7 +24,8 @@ export function messageManager(
   },
   dispatchMessages: (action: MessageAction) => void,
   addUser: (data: User) => void,
-  addUsers: (data: User[]) => void
+  addUsers: (data: User[]) => void,
+  clearUsers: () => void
 ): void {
   if (!validMessageResponse(data)) {
     return;
@@ -35,36 +36,36 @@ export function messageManager(
         return;
       }
       const isLog = data.payload.user.isLogined;
-      if (isLog) {
-        const userDataString = usersMap.current?.get(data.id);
-        if (!userDataString) {
-          return;
-        }
-        const userData: unknown = JSON.parse(userDataString);
-
-        if (isUser(userData)) {
-          authService.signIn(userData);
-        }
-
-        usersMap.current?.delete(data.id);
-        navigate('/chat');
-        getUsersList(sendMessage);
-      } else {
-        currentUser.current = null;
-        authService.signOut();
+      if (!isLog) {
+        return;
       }
+      const userDataString = pendingMessagesMap.current?.get(data.id);
+      if (!userDataString) {
+        return;
+      }
+      const userData: unknown = JSON.parse(userDataString);
+
+      if (isUser(userData)) {
+        authService.signIn(userData);
+        currentUser.current = userData;
+      }
+
+      pendingMessagesMap.current?.delete(data.id);
+      navigate('/chat');
+      getUsersList(sendMessage);
+
       break;
     }
     case 'USER_ACTIVE':
     case 'USER_INACTIVE': {
       if (!isAuthUsersResponse(data)) return;
-      addUsers(data.payload.users);
-
-      getUserMessages(
-        sendMessage,
-        currentUser.current?.login,
-        data.payload.users
+      const users = data.payload.users.filter(
+        (user) => user.login !== currentUser.current?.login
       );
+
+      addUsers(users);
+
+      getUserMessages(sendMessage, users);
       break;
     }
     case 'USER_EXTERNAL_LOGIN':
@@ -77,9 +78,9 @@ export function messageManager(
     }
     case 'MSG_FROM_USER': {
       if (isAllMessages(data)) {
-        const login = usersMap.current?.get(data.id);
+        const login = pendingMessagesMap.current?.get(data.id);
 
-        usersMap.current?.delete(data.id);
+        pendingMessagesMap.current?.delete(data.id);
 
         if (!login) return;
         dispatchMessages({
@@ -114,8 +115,9 @@ export function messageManager(
       const isLog = data.payload.user.isLogined;
       if (!isLog) {
         authService.signOut();
+        currentUser.current = null;
         navigate('/');
-        addUsers([]);
+        clearUsers();
       }
       break;
     }

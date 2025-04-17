@@ -11,7 +11,9 @@ export function useWebSockets(): WebSocketHook {
   const [messages, dispatchMessages] = React.useReducer(messagesReducer, {});
   const socketRef = React.useRef<WebSocket | null>(null);
   const currentUser = React.useRef<UserData | null>(authService.getUser());
-  const usersMap = React.useRef<Map<string, string>>(new Map<string, string>());
+  const pendingMessagesMap = React.useRef<Map<string, string>>(
+    new Map<string, string>()
+  );
 
   const addUser = (user: User): void => {
     setUserlist((pre) => {
@@ -26,6 +28,10 @@ export function useWebSockets(): WebSocketHook {
 
   const addUsers = (data: User[]): void => {
     setUserlist((pre) => [...pre, ...data]);
+  };
+
+  const clearUsers = (): void => {
+    setUserlist([]);
   };
 
   const connect = React.useCallback(() => {
@@ -50,12 +56,13 @@ export function useWebSockets(): WebSocketHook {
 
       messageManager(
         data,
-        usersMap,
+        pendingMessagesMap,
         sendMessage,
         currentUser,
         dispatchMessages,
         addUser,
-        addUsers
+        addUsers,
+        clearUsers
       );
     };
 
@@ -79,10 +86,13 @@ export function useWebSockets(): WebSocketHook {
       };
 
       if (isGetHistoryMessage(message)) {
-        usersMap.current?.set(id, message.payload.user.login);
+        pendingMessagesMap.current?.set(id, message.payload.user.login);
       }
       if (isAuthMessage(message)) {
-        usersMap.current?.set(id, JSON.stringify(message.payload.user));
+        pendingMessagesMap.current?.set(
+          id,
+          JSON.stringify(message.payload.user)
+        );
       }
 
       if (
