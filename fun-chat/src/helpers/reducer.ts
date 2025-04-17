@@ -14,6 +14,24 @@ export function messagesReducer(
         [action.login]: [...(state[action.login] || []), action.message],
       };
     }
+    case 'UPDATE_MESSAGE': {
+      const newState = { ...state };
+      for (const login in newState) {
+        newState[login] = newState[login].map((message) => {
+          if (message.id === action.message.id) {
+            return {
+              ...message,
+              status: {
+                ...message.status,
+                ...action.message.status,
+              },
+            };
+          }
+          return message;
+        });
+      }
+      return newState;
+    }
     default: {
       return state;
     }

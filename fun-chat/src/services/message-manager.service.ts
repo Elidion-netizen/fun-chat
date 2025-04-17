@@ -7,6 +7,7 @@ import {
   isUserLoginResponse,
   isUserLogoutResponse,
   validMessageResponse,
+  validUpdateMessage,
 } from '@/validators';
 import { authService } from './local-storage.service';
 import { navigate } from '@/react/router';
@@ -108,6 +109,17 @@ export function messageManager(
           message: data.payload.message,
         });
       }
+      break;
+    }
+    case 'MSG_DELIVER':
+    case 'MSG_READ': {
+      if (!validUpdateMessage(data)) {
+        return;
+      }
+      dispatchMessages({
+        type: 'UPDATE_MESSAGE',
+        message: data.payload.message,
+      });
       break;
     }
     case 'USER_LOGOUT': {

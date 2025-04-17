@@ -116,6 +116,18 @@ export type Message = {
   };
 };
 
+export type UpdateMessage = MessageResponse & {
+  payload: {
+    message: DeliveryResponse;
+  };
+};
+
+type DeliveryResponse = {
+  id: string;
+  status: Record<string, boolean>;
+};
+
 export type MessageAction =
   | { type: 'SET_ALL_MESSAGES'; login: string; messages: Message[] }
-  | { type: 'ADD_MESSAGE'; login: string; message: Message };
+  | { type: 'ADD_MESSAGE'; login: string; message: Message }
+  | { type: 'UPDATE_MESSAGE'; message: DeliveryResponse };

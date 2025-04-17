@@ -12,6 +12,7 @@ import type {
   SocketMessage,
   GetHistoryMessage,
   UserData,
+  UpdateMessage,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -106,6 +107,31 @@ export function isUser(user: unknown): user is UserData {
   );
 }
 
+export const validMessageResponse = (
+  data: unknown
+): data is MessageResponse => {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    'type' in data &&
+    'payload' in data &&
+    typeof data.payload === 'object' &&
+    data.payload !== null
+  );
+};
+
+export const validUpdateMessage = (
+  data: MessageResponse
+): data is UpdateMessage => {
+  return (
+    data.payload !== null &&
+    'message' in data.payload &&
+    typeof data.payload.message === 'object' &&
+    data.payload.message !== null
+  );
+};
+
 const validUserResponse = (data: unknown): data is ResponseData => {
   return (
     typeof data === 'object' &&
@@ -163,19 +189,5 @@ const validMessage = (data: unknown): data is Message => {
     typeof data.status.isReaded === 'boolean' &&
     'isEdited' in data.status &&
     typeof data.status.isEdited === 'boolean'
-  );
-};
-
-export const validMessageResponse = (
-  data: unknown
-): data is MessageResponse => {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'id' in data &&
-    'type' in data &&
-    'payload' in data &&
-    typeof data.payload === 'object' &&
-    data.payload !== null
   );
 };
