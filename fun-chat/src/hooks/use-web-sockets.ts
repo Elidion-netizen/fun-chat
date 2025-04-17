@@ -1,3 +1,4 @@
+import { getUserMessages, getUsersList } from '@/helpers/messages';
 import React from '@/react';
 import { navigate } from '@/react/router';
 import type {
@@ -45,14 +46,9 @@ export function useWebSockets(): WebSocketHook {
         const isLog = data.payload.user.isLogined;
         if (isLog) {
           navigate('/chat');
-          sendMessage({
-            payload: null,
-            type: 'USER_ACTIVE',
-          });
-          sendMessage({
-            payload: null,
-            type: 'USER_INACTIVE',
-          });
+          getUsersList(sendMessage);
+        } else {
+          currentUser.current = null;
         }
       }
 
@@ -62,10 +58,7 @@ export function useWebSockets(): WebSocketHook {
           if (user.login === currentUser.current?.login) {
             continue;
           }
-          sendMessage({
-            type: 'MSG_FROM_USER',
-            payload: { user: { login: user.login } },
-          });
+          getUserMessages(sendMessage, user.login);
         }
       }
 
@@ -75,10 +68,7 @@ export function useWebSockets(): WebSocketHook {
           if (user.login === currentUser.current?.login) {
             continue;
           }
-          sendMessage({
-            type: 'MSG_FROM_USER',
-            payload: { user: { login: user.login } },
-          });
+          getUserMessages(sendMessage, user.login);
         }
       }
 
