@@ -54,10 +54,12 @@ export function Chat({
           onChange={(e) => setChatMessage(e.target.value)}
           placeholder="Write message..."
           className="flex-1 p-2 border border-gray-300 rounded"
+          disabled={!talker}
         />
         <button
           className="ml-2 p-2 bg-blue-500 text-white rounded"
           onClick={sendNewMessage}
+          disabled={!talker}
         >
           Send
         </button>

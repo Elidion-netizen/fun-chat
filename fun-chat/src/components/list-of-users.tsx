@@ -29,8 +29,10 @@ export function UserList({
             >
               <p>
                 {el.login}{' '}
-                {unreadCounts[el.login] && (
-                  <span>{unreadCounts[el.login]}</span>
+                {unreadCounts[el.login] > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center rounded-full bg-blue-400 text-white text-xs w-5 h-5">
+                    {unreadCounts[el.login]}
+                  </span>
                 )}
               </p>
             </li>
