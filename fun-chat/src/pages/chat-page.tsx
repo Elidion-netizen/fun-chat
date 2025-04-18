@@ -2,16 +2,14 @@ import { Context } from '@/app';
 import { Chat } from '@/components/chat-room';
 import { UserList } from '@/components/list-of-users';
 import React from '@/react';
+import { Link } from '@/react/router/link';
 import type { Message, User } from '@/types';
+
 export function ChatPage(): React.JSX.Element {
   const { sendMessage, currentUserRef, userlist, messages } =
     React.useContext(Context);
   const [talker, setTalker] = React.useState<User | null>(null);
   const [autoReadEnabled, setAutoReadEnabled] = React.useState(false);
-
-  React.useEffect(() => {
-    setAutoReadEnabled(false);
-  }, [talker]);
 
   function activeateChat(): void {
     setAutoReadEnabled(true);
@@ -47,8 +45,13 @@ export function ChatPage(): React.JSX.Element {
           }
         }
       }
-      if (unread.length === 0 && !autoReadEnabled) {
-        setAutoReadEnabled(true);
+      if (
+        unread.length === 0 &&
+        !autoReadEnabled &&
+        talker &&
+        talker.login === user
+      ) {
+        activeateChat();
       }
 
       filteredMessages[user] = { unread, read };
@@ -67,26 +70,40 @@ export function ChatPage(): React.JSX.Element {
 
   function activateChat(user: User): void {
     setTalker(user);
+    setAutoReadEnabled(false);
   }
 
   return (
-    <section className="flex h-full relative">
-      <UserList
-        currentUser={currentUserRef.current?.login}
-        activateChat={activateChat}
-        userlist={userlist}
-        unreadCounts={unreadCounts}
-      />
+    <section className="h-screen">
+      <header className="flex justify-between items-center px-5 py-2">
+        <p>Current user: {currentUserRef.current?.login}</p>
+        <h1>FUN CHAT</h1>
+        <div className="flex align-middle">
+          <Link to="/about" className="flex items-center">
+            About
+          </Link>
+          <button
+            className="ml-3 py-2 px-4 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150"
+            onClick={logout}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+      <div className="flex h-[calc(100%-3.5em)]">
+        <UserList
+          currentUser={currentUserRef.current?.login}
+          activateChat={activateChat}
+          userlist={userlist}
+          unreadCounts={unreadCounts}
+        />
 
-      <Chat
-        talker={talker}
-        activeateChat={activeateChat}
-        filteredMessages={filteredMessages}
-      />
-
-      <button className="absolute top-5 right-5" onClick={() => logout()}>
-        Logout
-      </button>
+        <Chat
+          talker={talker}
+          activeateChat={activeateChat}
+          filteredMessages={filteredMessages}
+        />
+      </div>
     </section>
   );
 }

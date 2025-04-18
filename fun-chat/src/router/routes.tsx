@@ -1,7 +1,8 @@
+import React from '@/react';
 import { AuthGuard } from '@/router/auth-guard';
 import { ChatPage } from '@/pages/chat-page';
 import { Login } from '@/pages/login-page';
-import React from '@/react';
+import { About } from '@/pages/about-page';
 
 export const routes = [
   {
@@ -19,5 +20,9 @@ export const routes = [
     guard: (): boolean => AuthGuard(),
     redirectTo: '/auth',
     component: <ChatPage />,
+  },
+  {
+    path: '/about',
+    component: <About />,
   },
 ];

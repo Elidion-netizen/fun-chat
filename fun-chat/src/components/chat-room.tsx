@@ -15,6 +15,10 @@ export function Chat({
   const { sendMessage, userlist } = React.useContext(Context);
   const [chatMessage, setChatMessage] = React.useState('');
 
+  React.useEffect(() => {
+    setChatMessage('');
+  }, [talker]);
+
   function sendNewMessage(): void {
     if (chatMessage.length === 0 || talker === null) return;
     activeateChat();
@@ -31,7 +35,7 @@ export function Chat({
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full">
       {talker && (
         <div className="p-4 bg-blue-100 border-b border-blue-300 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-blue-700">
