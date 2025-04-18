@@ -7,6 +7,15 @@ export function ChatPage(): React.JSX.Element {
   const { sendMessage, currentUserRef, userlist, messages } =
     React.useContext(Context);
   const [talker, setTalker] = React.useState<User | null>(null);
+  const [autoReadEnabled, setAutoReadEnabled] = React.useState(false);
+
+  React.useEffect(() => {
+    setAutoReadEnabled(false);
+  }, [talker]);
+
+  function activeateChat(): void {
+    setAutoReadEnabled(true);
+  }
 
   const { filteredMessages, unreadCounts } = React.useMemo(() => {
     const filteredMessages: Record<string, Record<string, Message[]>> = {};
@@ -16,18 +25,38 @@ export function ChatPage(): React.JSX.Element {
       const read: Message[] = [];
 
       for (const message of messages[user]) {
-        if (message.status.isReaded) {
+        if (
+          message.status.isReaded ||
+          message.from === currentUserRef.current?.login
+        ) {
           read.push(message);
         } else {
-          unread.push(message);
+          if (autoReadEnabled && message.from === talker?.login) {
+            message.status.isReaded = true;
+            sendMessage({
+              type: 'MSG_READ',
+              payload: {
+                message: {
+                  id: message.id,
+                },
+              },
+            });
+            read.push(message);
+          } else {
+            unread.push(message);
+          }
         }
+      }
+      if (unread.length === 0 && !autoReadEnabled) {
+        setAutoReadEnabled(true);
       }
 
       filteredMessages[user] = { unread, read };
       unreadCounts[user] = unread.length;
     }
     return { filteredMessages, unreadCounts };
-  }, [messages]);
+  }, [messages, autoReadEnabled, talker]);
+
   function logout(): void {
     if (!currentUserRef.current) return;
     sendMessage({
@@ -49,7 +78,11 @@ export function ChatPage(): React.JSX.Element {
         unreadCounts={unreadCounts}
       />
 
-      <Chat talker={talker} filteredMessages={filteredMessages} />
+      <Chat
+        talker={talker}
+        activeateChat={activeateChat}
+        filteredMessages={filteredMessages}
+      />
 
       <button className="absolute top-5 right-5" onClick={() => logout()}>
         Logout

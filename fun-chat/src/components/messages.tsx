@@ -5,12 +5,17 @@ import { MessageElement } from './message';
 export function Messages({
   talker,
   filteredMessages,
+  activeateChat,
 }: {
   talker: User | null;
   filteredMessages: Record<string, Record<string, Message[]>>;
+  activeateChat: () => void;
 }): React.JSX.Element {
   return (
-    <div className="flex-1 p-4 overflow-y-auto bg-white">
+    <div
+      onClick={activeateChat}
+      className="flex-1 p-4 overflow-y-auto bg-white"
+    >
       {talker !== null && `${talker.login}` in filteredMessages && (
         <>
           <>

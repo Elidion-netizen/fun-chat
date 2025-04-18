@@ -6,15 +6,18 @@ import type { Message, User } from '@/types';
 export function Chat({
   talker,
   filteredMessages,
+  activeateChat,
 }: {
   talker: User | null;
   filteredMessages: Record<string, Record<string, Message[]>>;
+  activeateChat: () => void;
 }): React.JSX.Element {
   const { sendMessage, userlist } = React.useContext(Context);
   const [chatMessage, setChatMessage] = React.useState('');
 
   function sendNewMessage(): void {
     if (chatMessage.length === 0 || talker === null) return;
+    activeateChat();
     sendMessage({
       type: 'MSG_SEND',
       payload: {
@@ -46,7 +49,11 @@ export function Chat({
         </div>
       )}
 
-      <Messages talker={talker} filteredMessages={filteredMessages} />
+      <Messages
+        activeateChat={activeateChat}
+        talker={talker}
+        filteredMessages={filteredMessages}
+      />
 
       <div className="p-4 bg-gray-200 flex">
         <input
