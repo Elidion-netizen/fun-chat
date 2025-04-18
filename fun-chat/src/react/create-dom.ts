@@ -18,7 +18,7 @@ export const createDOM = (fiberNode: FiberNode): FiberNodeDOM => {
   if (type === 'TEXT') {
     DOM = document.createTextNode('');
   } else if (typeof type === 'string') {
-    DOM = ['svg', 'path', 'g'].includes(type)
+    DOM = ['svg', 'path', 'g', 'circle'].includes(type)
       ? document.createElementNS('http://www.w3.org/2000/svg', type)
       : document.createElement(type);
     if (typeof props === 'object' && props.ref) {

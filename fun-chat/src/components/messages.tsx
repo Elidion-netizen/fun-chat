@@ -11,6 +11,17 @@ export function Messages({
   filteredMessages: Record<string, Record<string, Message[]>>;
   activeateChat: () => void;
 }): React.JSX.Element {
+  const separatorRef = React.useRef<HTMLBRElement | null>(null);
+
+  React.useEffect(() => {
+    if (separatorRef.current) {
+      separatorRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [talker]);
+
   return (
     <div
       onClick={activeateChat}
@@ -18,13 +29,14 @@ export function Messages({
     >
       {talker !== null && `${talker.login}` in filteredMessages && (
         <>
-          <>
+          <div>
             {filteredMessages[talker.login].read.length > 0 &&
               filteredMessages[talker.login].read.map((el) => (
                 <MessageElement message={el} />
               ))}
-          </>
-          <>
+          </div>
+          <br ref={separatorRef}></br>
+          <div>
             {filteredMessages[talker.login].unread.length > 0 && (
               <div className="relative my-6 flex items-center">
                 <div className="flex-grow border-t border-gray-300"></div>
@@ -34,7 +46,7 @@ export function Messages({
                 <div className="flex-grow border-t border-gray-300"></div>
               </div>
             )}
-          </>
+          </div>
           <>
             {filteredMessages[talker.login].unread.length > 0 &&
               filteredMessages[talker.login].unread.map((el) => (

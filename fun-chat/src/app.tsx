@@ -35,7 +35,7 @@ export function App(): React.JSX.Element {
         }}
       >
         <p
-          className={`absolute left-1 bottom-2 z-10 ${isConnected ? 'text-green-500' : 'text-red-500'}`}
+          className={`absolute left-3 bottom-15 z-10 ${isConnected ? 'text-green-500' : 'text-red-500'}`}
         >
           Connection
         </p>
