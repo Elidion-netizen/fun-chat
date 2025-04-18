@@ -1,26 +1,9 @@
 import React from '@/react';
+import { routes } from './router/routes';
 import { Router } from '@react/router';
 import { NotFound } from './pages/not-found-page';
-import { Login } from './pages/login-page';
-import { ChatPage } from './pages/chat-page';
 import { useWebSockets } from './hooks/use-web-sockets';
 import type { WebSocketHook } from './types';
-import { AuthGuard } from './helpers/auth-guard';
-
-const routes = [
-  {
-    path: '/',
-    guard: (): boolean => !AuthGuard(),
-    redirectTo: '/chat',
-    component: <Login />,
-  },
-  {
-    path: '/chat',
-    guard: (): boolean => AuthGuard(),
-    redirectTo: '/',
-    component: <ChatPage />,
-  },
-];
 
 export const Context = React.createContext<WebSocketHook>();
 export function App(): React.JSX.Element {

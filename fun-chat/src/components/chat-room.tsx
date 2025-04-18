@@ -59,7 +59,7 @@ export function Chat({
         <button
           className="ml-2 p-2 bg-blue-500 text-white rounded"
           onClick={sendNewMessage}
-          disabled={!talker}
+          disabled={!talker || chatMessage.length === 0}
         >
           Send
         </button>

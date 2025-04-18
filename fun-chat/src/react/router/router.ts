@@ -8,7 +8,7 @@ interface RouterProps {
     path: string;
     guard?: () => boolean;
     redirectTo?: string;
-    component: React.ReactNode;
+    component?: React.ReactNode;
   }[];
   fallback: React.ReactNode;
 }
@@ -20,8 +20,8 @@ export const Router = ({ routes, fallback }: RouterProps): React.ReactNode => {
     (path: string): string => {
       const route = routes.find((r) => r.path === path);
       if (!route) return path;
-      if (route.guard && !route.guard()) {
-        return route.redirectTo ?? '/';
+      if (route.redirectTo && (!route.guard || !route.guard())) {
+        return route.redirectTo;
       }
       return path;
     },

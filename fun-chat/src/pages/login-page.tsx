@@ -24,10 +24,48 @@ export function Login(): React.JSX.Element {
     sendMessage(request);
   }
   return (
-    <form onSubmit={login}>
-      <input type="text" name="login" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
+    <section className="h-screen flex items-center justify-center bg-gray-100">
+      <form
+        className="max-w-xl py-6 px-8 h-80 bg-white rounded shadow-xl"
+        onSubmit={login}
+      >
+        <div className="mb-6">
+          <label className="block text-gray-800 font-bold" htmlFor="login">
+            Login:
+          </label>
+          <input
+            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
+            type="text"
+            name="login"
+            id="login"
+            placeholder="Username"
+            minLength={3}
+            maxLength={20}
+            required
+          />
+        </div>
+        <div className="mb-6">
+          <label className="block text-gray-800 font-bold" htmlFor="password">
+            Password:
+          </label>
+          <input
+            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
+            type="password"
+            name="password"
+            id="password"
+            minLength={3}
+            maxLength={20}
+            placeholder="Password"
+            required
+          />
+        </div>
+        <button
+          className="py-2 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150"
+          type="submit"
+        >
+          Login
+        </button>
+      </form>
+    </section>
   );
 }
