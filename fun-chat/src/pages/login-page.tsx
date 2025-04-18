@@ -1,5 +1,6 @@
 import { Context } from '@/app';
 import React from '@/react';
+import { Link } from '@/react/router/link';
 
 export function Login(): React.JSX.Element {
   const { sendMessage } = React.useContext(Context);
@@ -26,7 +27,7 @@ export function Login(): React.JSX.Element {
   return (
     <section className="h-screen flex items-center justify-center bg-gray-100">
       <form
-        className="max-w-xl py-6 px-8 h-80 bg-white rounded shadow-xl"
+        className="max-w-xl py-6 px-8 h-84 bg-white rounded shadow-xl"
         onSubmit={login}
       >
         <div className="mb-6">
@@ -65,6 +66,11 @@ export function Login(): React.JSX.Element {
         >
           Login
         </button>
+        <div className="text-center">
+          <Link className="leading-14" to="/about">
+            About
+          </Link>
+        </div>
       </form>
     </section>
   );
