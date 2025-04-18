@@ -44,7 +44,6 @@ export function useWebSockets(): WebSocketHook {
       setIsConnected(true);
 
       socketRef.current = ws;
-      console.log('open');
       if (currentUserRef.current !== null) {
         sendMessage({
           type: 'USER_LOGIN',

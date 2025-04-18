@@ -1,9 +1,15 @@
 import { Context } from '@/app';
 import React from '@/react';
 import { Messages } from './messages';
-import type { User } from '@/types';
+import type { Message, User } from '@/types';
 
-export function Chat({ talker }: { talker: User | null }): React.JSX.Element {
+export function Chat({
+  talker,
+  filteredMessages,
+}: {
+  talker: User | null;
+  filteredMessages: Record<string, Record<string, Message[]>>;
+}): React.JSX.Element {
   const { sendMessage, userlist } = React.useContext(Context);
   const [chatMessage, setChatMessage] = React.useState('');
 
@@ -40,7 +46,7 @@ export function Chat({ talker }: { talker: User | null }): React.JSX.Element {
         </div>
       )}
 
-      <Messages talker={talker} />
+      <Messages talker={talker} filteredMessages={filteredMessages} />
 
       <div className="p-4 bg-gray-200 flex">
         <input

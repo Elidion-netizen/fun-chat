@@ -1,76 +1,28 @@
-import { Context } from '@/app';
 import React from '@/react';
-import type { User } from '@/types';
+import type { Message, User } from '@/types';
+import { MessageElement } from './message';
 
 export function Messages({
   talker,
+  filteredMessages,
 }: {
   talker: User | null;
+  filteredMessages: Record<string, Record<string, Message[]>>;
 }): React.JSX.Element {
-  const { currentUserRef, messages } = React.useContext(Context);
-
   return (
     <div className="flex-1 p-4 overflow-y-auto bg-white">
       {talker !== null &&
-        `${talker.login}` in messages &&
-        messages[talker.login].length > 0 &&
-        messages[talker.login].map((el) => (
-          <div
-            key={el.id}
-            className={`flex ${
-              el.from === currentUserRef.current?.login
-                ? 'justify-end'
-                : 'justify-start'
-            } mb-4`}
-          >
-            <div
-              className={`relative max-w-xs rounded-lg px-3 pt-3 pb-6 shadow-md ${
-                el.from === currentUserRef.current?.login
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-black'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">
-                    {el.from === currentUserRef.current?.login
-                      ? 'You'
-                      : el.from}
-                  </span>
-                  <div className="flex gap-2 items-center">
-                    <span
-                      className={`text-xs ${
-                        el.from === currentUserRef.current?.login
-                          ? 'text-white/70'
-                          : 'text-gray-400'
-                      }`}
-                    >
-                      {new Date(el.datetime).toLocaleTimeString()}
-                    </span>
-                  </div>
-                  {el.from === currentUserRef.current?.login && (
-                    <span
-                      className={`text-xs font-medium ${
-                        el.status.isDelivered
-                          ? 'text-green-300'
-                          : 'text-yellow-200'
-                      }`}
-                    >
-                      {el.status.isDelivered ? 'Delivered' : 'Sending...'}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <p className="break-words pr-8">{el.text}</p>
-              <div className="flex justify-end mt-2 text-xs">
-                {el.from === currentUserRef.current?.login && (
-                  <span className="text-white/70">
-                    {el.status.isReaded ? 'Read' : 'Unread'}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+        `${talker.login}` in filteredMessages &&
+        filteredMessages[talker.login].read.length > 0 &&
+        filteredMessages[talker.login].read.map((el) => (
+          <MessageElement message={el} />
+        ))}
+      <br />
+      {talker !== null &&
+        `${talker.login}` in filteredMessages &&
+        filteredMessages[talker.login].unread.length > 0 &&
+        filteredMessages[talker.login].unread.map((el) => (
+          <MessageElement message={el} />
         ))}
     </div>
   );

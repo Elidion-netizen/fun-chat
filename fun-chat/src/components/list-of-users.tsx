@@ -5,10 +5,12 @@ export function UserList({
   userlist,
   currentUser,
   activateChat,
+  unreadCounts,
 }: {
   userlist: User[];
   currentUser: string | undefined;
   activateChat: (user: User) => void;
+  unreadCounts: Record<string, number>;
 }): React.JSX.Element {
   return (
     <div className="w-1/4 bg-gray-200 p-4 border-r">
@@ -25,7 +27,12 @@ export function UserList({
               className={`cursor-pointer ${el.isLogined ? 'text-green-600' : 'text-gray-400'}`}
               onClick={() => activateChat(el)}
             >
-              {el.login}
+              <p>
+                {el.login}{' '}
+                {unreadCounts[el.login] && (
+                  <span>{unreadCounts[el.login]}</span>
+                )}
+              </p>
             </li>
           ))}
       </ul>
