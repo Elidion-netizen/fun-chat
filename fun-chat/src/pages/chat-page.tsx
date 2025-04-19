@@ -50,7 +50,7 @@ export function ChatPage(): React.JSX.Element {
             About
           </Link>
           <button
-            className="ml-3 py-2 px-4 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150"
+            className="ml-3 py-2 px-4 bg-indigo-400 text-white font-bold w-full text-center rounded hover:bg-indigo-500 transition-colors duration-400 ease-in-out"
             onClick={logout}
           >
             Logout

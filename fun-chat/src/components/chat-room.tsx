@@ -60,7 +60,10 @@ export function Chat({
         filteredMessages={filteredMessages}
       />
 
-      <form onSubmit={sendNewMessage} className="p-4 bg-gray-200 flex">
+      <form
+        onSubmit={sendNewMessage}
+        className="p-4 bg-gray-50 border-gray-200 border-2 flex"
+      >
         <input
           value={chatMessage}
           onChange={(e) => setChatMessage(e.target.value)}
@@ -70,10 +73,12 @@ export function Chat({
         />
         <button
           type="submit"
-          className="ml-2 p-2 bg-blue-500 text-white rounded"
+          className="inline-flex ml-4 justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600 rotate-90 transition-colors duration-500 ease-in-out"
           disabled={!talker || chatMessage.length === 0}
         >
-          Send
+          <svg width={24} height={24} fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+          </svg>
         </button>
       </form>
     </div>
