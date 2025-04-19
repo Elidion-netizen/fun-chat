@@ -50,7 +50,7 @@ export function messageManager(
       currentUserRef.current = userData;
 
       pendingMessagesMapRef.current?.delete(data.id);
-      navigate('/chat');
+      navigate();
       getUsersList(sendMessage);
 
       break;
@@ -146,7 +146,7 @@ export function messageManager(
       if (!isLog) {
         authService.signOut();
         currentUserRef.current = null;
-        navigate('/');
+        navigate();
         clearUsers();
       }
       break;

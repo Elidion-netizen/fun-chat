@@ -7,7 +7,7 @@ import { About } from '@/pages/about-page';
 export const routes = [
   {
     path: '/',
-    redirectTo: '/auth',
+    redirectTo: AuthGuard() ? '/chat' : '/auth',
   },
   {
     path: '/auth',
