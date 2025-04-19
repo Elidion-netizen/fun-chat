@@ -13,6 +13,7 @@ import type {
   GetHistoryMessage,
   UserData,
   UpdateMessage,
+  EditMessageResponse,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -129,6 +130,20 @@ export const validUpdateMessage = (
     'message' in data.payload &&
     typeof data.payload.message === 'object' &&
     data.payload.message !== null
+  );
+};
+
+export const validEditMessage = (
+  data: MessageResponse
+): data is EditMessageResponse => {
+  return (
+    validUpdateMessage(data) &&
+    'text' in data.payload.message &&
+    typeof data.payload.message.text === 'string' &&
+    typeof data.payload.message.status === 'object' &&
+    data.payload.message.status !== null &&
+    'isEdited' in data.payload.message.status &&
+    typeof data.payload.message.status.isEdited === 'boolean'
   );
 };
 

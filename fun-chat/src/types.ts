@@ -116,9 +116,26 @@ export type Message = {
   };
 };
 
+type EditMessage = Pick<Message, 'id' | 'text'> & {
+  status: {
+    isEdited: boolean;
+  };
+};
+
 export type UpdateMessage = MessageResponse & {
   payload: {
     message: DeliveryResponse;
+  };
+};
+
+export type EditMessageResponse = MessageResponse & {
+  payload: {
+    message: DeliveryResponse & {
+      text: string;
+      status: {
+        isEdited: boolean;
+      };
+    };
   };
 };
 
@@ -130,4 +147,6 @@ type DeliveryResponse = {
 export type MessageAction =
   | { type: 'SET_ALL_MESSAGES'; login: string; messages: Message[] }
   | { type: 'ADD_MESSAGE'; login: string; message: Message }
-  | { type: 'UPDATE_MESSAGE'; message: DeliveryResponse };
+  | { type: 'UPDATE_MESSAGE'; message: DeliveryResponse }
+  | { type: 'DELETE_MESSAGE'; message: DeliveryResponse }
+  | { type: 'EDIT_MESSAGE'; message: EditMessage };

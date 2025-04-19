@@ -24,3 +24,36 @@ export function getUserMessages(
     });
   }
 }
+
+export function deleteMessage(
+  sendMessage: (message: SocketMessage) => void,
+  id: string
+): void {
+  sendMessage({
+    type: 'MSG_DELETE',
+    payload: {
+      message: {
+        id,
+        status: {
+          isDeleted: true,
+        },
+      },
+    },
+  });
+}
+
+export function sendEditedMessage(
+  sendMessage: (message: SocketMessage) => void,
+  id: string,
+  text: string
+): void {
+  sendMessage({
+    type: 'MSG_EDIT',
+    payload: {
+      message: {
+        id,
+        text,
+      },
+    },
+  });
+}

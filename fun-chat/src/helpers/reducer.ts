@@ -32,6 +32,34 @@ export function messagesReducer(
       }
       return newState;
     }
+    case 'EDIT_MESSAGE': {
+      const newState = { ...state };
+      for (const login in newState) {
+        newState[login] = newState[login].map((message) => {
+          if (message.id === action.message.id) {
+            return {
+              ...message,
+              text: action.message.text,
+              status: {
+                ...message.status,
+                ...action.message.status,
+              },
+            };
+          }
+          return message;
+        });
+      }
+      return newState;
+    }
+    case 'DELETE_MESSAGE': {
+      const newState = { ...state };
+      for (const login in newState) {
+        newState[login] = newState[login].filter(
+          (message) => message.id !== action.message.id
+        );
+      }
+      return newState;
+    }
     default: {
       return state;
     }

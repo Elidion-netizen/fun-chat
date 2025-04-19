@@ -1,22 +1,40 @@
 import { Context } from '@/app';
+import { deleteMessage, sendEditedMessage } from '@/helpers/messages';
 import React from '@/react';
-import type { Message } from '@/types';
+import type { Message, SocketMessage } from '@/types';
 
 export function MessageElement({
   message,
 }: {
   message: Message;
 }): React.JSX.Element {
-  const { currentUserRef } = React.useContext(Context);
+  const { currentUserRef, sendMessage } = React.useContext(Context);
+  const [hasControls, setHasControls] = React.useState(false);
+  const [isEdit, setIsEdit] = React.useState(false);
+  const [editedMessage, setEditedMessage] = React.useState(message.text);
+
+  function messageMenu(name: string): void {
+    if (currentUserRef.current?.login === name) setHasControls((pre) => !pre);
+  }
+
+  function confirmEdit(
+    sendMessage: (message: SocketMessage) => void,
+    id: string,
+    editedMessage: string
+  ): void {
+    sendEditedMessage(sendMessage, id, editedMessage);
+    setIsEdit(false);
+  }
 
   return (
     <div
       key={message.id}
+      onClick={() => messageMenu(message.from)}
       className={`flex ${
         message.from === currentUserRef.current?.login
           ? 'justify-end'
           : 'justify-start'
-      } mb-4`}
+      } mb-4 relative`}
     >
       <div
         className={`relative max-w-xs rounded-lg px-3 pt-3 pb-6 shadow-md ${
@@ -56,15 +74,50 @@ export function MessageElement({
             )}
           </div>
         </div>
-        <p className="break-words pr-8">{message.text}</p>
+        <div>
+          {isEdit ? (
+            <div className="relative">
+              <label>
+                <input
+                  value={editedMessage}
+                  onChange={(e) => setEditedMessage(e.target.value)}
+                ></input>
+              </label>
+              <div className="absolute right-0 top-0">
+                <button
+                  onClick={() =>
+                    confirmEdit(sendMessage, message.id, editedMessage)
+                  }
+                >
+                  Confirm
+                </button>
+                <button onClick={() => setIsEdit(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <p className="break-words pr-8">{message.text}</p>
+          )}
+        </div>
         <div className="flex justify-end mt-2 text-xs">
           {message.from === currentUserRef.current?.login && (
             <span className="text-white/70">
-              {message.status.isReaded ? 'Read' : 'Unread'}
+              {message.status.isEdited
+                ? 'Edited'
+                : message.status.isReaded
+                  ? 'Read'
+                  : 'Unread'}
             </span>
           )}
         </div>
       </div>
+      {!isEdit && hasControls && (
+        <div className="absolute -right-2 -bottom-2">
+          <button onClick={() => setIsEdit(true)}>Edin</button>
+          <button onClick={() => deleteMessage(sendMessage, message.id)}>
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   isUser,
   isUserLoginResponse,
   isUserLogoutResponse,
+  validEditMessage,
   validMessageResponse,
   validUpdateMessage,
 } from '@/validators';
@@ -118,6 +119,22 @@ export function messageManager(
 
       dispatchMessages({
         type: 'UPDATE_MESSAGE',
+        message: data.payload.message,
+      });
+      break;
+    }
+    case 'MSG_EDIT': {
+      if (!validEditMessage(data)) return;
+      dispatchMessages({
+        type: 'EDIT_MESSAGE',
+        message: data.payload.message,
+      });
+      break;
+    }
+    case 'MSG_DELETE': {
+      if (!validUpdateMessage(data)) return;
+      dispatchMessages({
+        type: 'DELETE_MESSAGE',
         message: data.payload.message,
       });
       break;

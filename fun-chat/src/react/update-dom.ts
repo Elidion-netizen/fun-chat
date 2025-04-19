@@ -9,10 +9,15 @@ export const updateDOM = (
 
   for (const [removePropKey, removePropValue] of Object.entries(prevProps)) {
     if (removePropKey.startsWith('on') && isEventListener(removePropValue)) {
-      DOM.removeEventListener(
-        removePropKey.slice(2).toLowerCase(),
-        removePropValue
-      );
+      const eventKey = removePropKey.slice(2).toLowerCase();
+      if (eventKey === 'change') {
+        DOM.removeEventListener('input', removePropValue);
+      } else {
+        DOM.removeEventListener(
+          removePropKey.slice(2).toLowerCase(),
+          removePropValue
+        );
+      }
     } else if (removePropKey !== defaultPropKeys) {
       Object.assign(DOM, { removePropKey: '' });
     }
@@ -20,7 +25,12 @@ export const updateDOM = (
 
   for (const [addPropKey, addPropValue] of Object.entries(nextProps)) {
     if (addPropKey.startsWith('on') && isEventListener(addPropValue)) {
-      DOM.addEventListener(addPropKey.slice(2).toLowerCase(), addPropValue);
+      const eventKey = addPropKey.slice(2).toLowerCase();
+      if (eventKey === 'change') {
+        DOM.addEventListener('input', addPropValue);
+      } else {
+        DOM.addEventListener(addPropKey.slice(2).toLowerCase(), addPropValue);
+      }
     } else if (addPropKey !== defaultPropKeys) {
       if (DOM instanceof SVGElement || DOM instanceof SVGPathElement) {
         DOM.setAttribute(addPropKey, String(addPropValue));
