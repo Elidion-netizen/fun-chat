@@ -4,6 +4,7 @@ import { Router } from '@react/router';
 import { NotFound } from './pages/not-found-page';
 import { useWebSockets } from './hooks/use-web-sockets';
 import type { WebSocketHook } from './types';
+import { ConnectionLost } from './components/connection-lost';
 
 export const Context = React.createContext<WebSocketHook>();
 export function App(): React.JSX.Element {
@@ -41,6 +42,7 @@ export function App(): React.JSX.Element {
         </p>
         <Router routes={routes} fallback={<NotFound />} />
       </Context.Provider>
+      {!isConnected && <ConnectionLost />}
     </main>
   );
 }

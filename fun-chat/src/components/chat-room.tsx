@@ -19,7 +19,8 @@ export function Chat({
     setChatMessage('');
   }, [talker]);
 
-  function sendNewMessage(): void {
+  function sendNewMessage(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
     if (chatMessage.length === 0 || talker === null) return;
     activateChatEvent();
     sendMessage({
@@ -59,7 +60,7 @@ export function Chat({
         filteredMessages={filteredMessages}
       />
 
-      <div className="p-4 bg-gray-200 flex">
+      <form onSubmit={sendNewMessage} className="p-4 bg-gray-200 flex">
         <input
           value={chatMessage}
           onChange={(e) => setChatMessage(e.target.value)}
@@ -68,13 +69,13 @@ export function Chat({
           disabled={!talker}
         />
         <button
+          type="submit"
           className="ml-2 p-2 bg-blue-500 text-white rounded"
-          onClick={sendNewMessage}
           disabled={!talker || chatMessage.length === 0}
         >
           Send
         </button>
-      </div>
+      </form>
     </div>
   );
 }

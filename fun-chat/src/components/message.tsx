@@ -13,7 +13,11 @@ export function MessageElement({
   const [isEdit, setIsEdit] = React.useState(false);
   const [editedMessage, setEditedMessage] = React.useState(message.text);
 
-  function messageMenu(name: string): void {
+  function messageMenu(
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    name: string
+  ): void {
+    e.preventDefault();
     if (currentUserRef.current?.login === name) setHasControls((pre) => !pre);
   }
 
@@ -26,10 +30,15 @@ export function MessageElement({
     setIsEdit(false);
   }
 
+  function cancelEdit(): void {
+    setIsEdit(false);
+    setEditedMessage(message.text);
+  }
+
   return (
     <div
       key={message.id}
-      onClick={() => messageMenu(message.from)}
+      onContextMenu={(e) => messageMenu(e, message.from)}
       className={`flex ${
         message.from === currentUserRef.current?.login
           ? 'justify-end'
@@ -76,22 +85,29 @@ export function MessageElement({
         </div>
         <div>
           {isEdit ? (
-            <div className="relative">
+            <div className="relative w-full">
               <label>
                 <input
+                  className="w-full pr-24 pl-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={editedMessage}
                   onChange={(e) => setEditedMessage(e.target.value)}
                 ></input>
               </label>
-              <div className="absolute right-0 top-0">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
                 <button
+                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                   onClick={() =>
                     confirmEdit(sendMessage, message.id, editedMessage)
                   }
                 >
                   Confirm
                 </button>
-                <button onClick={() => setIsEdit(false)}>Cancel</button>
+                <button
+                  onClick={cancelEdit}
+                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           ) : (
@@ -119,9 +135,17 @@ export function MessageElement({
         </div>
       </div>
       {!isEdit && hasControls && (
-        <div className="absolute -right-2 -bottom-2">
-          <button onClick={() => setIsEdit(true)}>Edit</button>
-          <button onClick={() => deleteMessage(sendMessage, message.id)}>
+        <div className="absolute -right-2 -bottom-2 flex gap-2">
+          <button
+            className="text-green-400 bg-blue-300/50 px-2 py-1 rounded hover:bg-blue-400/70 duration-300 ease-in-out"
+            onClick={() => setIsEdit(true)}
+          >
+            Edit
+          </button>
+          <button
+            className="text-red-400 bg-blue-300/50 px-2 py-1 rounded hover:bg-blue-400/70 duration-300 ease-in-out"
+            onClick={() => deleteMessage(sendMessage, message.id)}
+          >
             Delete
           </button>
         </div>
