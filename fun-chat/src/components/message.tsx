@@ -112,7 +112,7 @@ export function MessageElement({
       </div>
       {!isEdit && hasControls && (
         <div className="absolute -right-2 -bottom-2">
-          <button onClick={() => setIsEdit(true)}>Edin</button>
+          <button onClick={() => setIsEdit(true)}>Edit</button>
           <button onClick={() => deleteMessage(sendMessage, message.id)}>
             Delete
           </button>

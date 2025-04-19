@@ -20,7 +20,7 @@ export function Messages({
         block: 'start',
       });
     }
-  }, [talker]);
+  }, [talker, filteredMessages]);
 
   return (
     <div

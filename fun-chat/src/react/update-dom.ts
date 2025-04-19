@@ -10,7 +10,7 @@ export const updateDOM = (
   for (const [removePropKey, removePropValue] of Object.entries(prevProps)) {
     if (removePropKey.startsWith('on') && isEventListener(removePropValue)) {
       const eventKey = removePropKey.slice(2).toLowerCase();
-      if (eventKey === 'change') {
+      if (eventKey === 'change' && DOM.nodeName.toLowerCase() === 'input') {
         DOM.removeEventListener('input', removePropValue);
       } else {
         DOM.removeEventListener(
@@ -26,7 +26,7 @@ export const updateDOM = (
   for (const [addPropKey, addPropValue] of Object.entries(nextProps)) {
     if (addPropKey.startsWith('on') && isEventListener(addPropValue)) {
       const eventKey = addPropKey.slice(2).toLowerCase();
-      if (eventKey === 'change') {
+      if (eventKey === 'change' && DOM.nodeName.toLowerCase() === 'input') {
         DOM.addEventListener('input', addPropValue);
       } else {
         DOM.addEventListener(addPropKey.slice(2).toLowerCase(), addPropValue);

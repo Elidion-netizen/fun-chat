@@ -18,11 +18,12 @@ export function UserList({
     <div className="w-1/4 bg-gray-200 p-4 border-r">
       <h3 className="font-bold mb-2">List of users</h3>
       <input
+        className="mb-2 p-1 border w-full rounded"
         type="text"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       ></input>
-      <ul className="h-[90%] overflow-y-auto flex-1">
+      <ul className="h-[70%] overflow-y-auto flex-1">
         {userlist
           .sort((a, b) =>
             a.isLogined === b.isLogined ? 0 : a.isLogined ? -1 : 1
