@@ -99,14 +99,22 @@ export function MessageElement({
           )}
         </div>
         <div className="flex justify-end mt-2 text-xs">
-          {message.from === currentUserRef.current?.login && (
-            <span className="text-white/70">
-              {message.status.isEdited
-                ? 'Edited'
-                : message.status.isReaded
-                  ? 'Read'
-                  : 'Unread'}
+          {message.status.isEdited ? (
+            <span
+              className={
+                message.from === currentUserRef.current?.login
+                  ? 'text-white/70'
+                  : 'text-gray-400'
+              }
+            >
+              Edited
             </span>
+          ) : (
+            message.from === currentUserRef.current?.login && (
+              <span className="text-white/70">
+                {message.status.isReaded ? 'Read' : 'Unread'}
+              </span>
+            )
           )}
         </div>
       </div>
