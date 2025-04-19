@@ -5,11 +5,11 @@ import { MessageElement } from './message';
 export function Messages({
   talker,
   filteredMessages,
-  activeateChat,
+  activateChatEvent,
 }: {
   talker: User | null;
   filteredMessages: Record<string, Record<string, Message[]>>;
-  activeateChat: () => void;
+  activateChatEvent: () => void;
 }): React.JSX.Element {
   const separatorRef = React.useRef<HTMLBRElement | null>(null);
 
@@ -24,7 +24,7 @@ export function Messages({
 
   return (
     <div
-      onClick={activeateChat}
+      onClick={activateChatEvent}
       className="flex-1 p-4 overflow-y-auto bg-white"
     >
       {talker !== null && `${talker.login}` in filteredMessages && (

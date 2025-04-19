@@ -11,9 +11,9 @@ export function ChatPage(): React.JSX.Element {
   const [talker, setTalker] = React.useState<User | null>(null);
   const [autoReadEnabled, setAutoReadEnabled] = React.useState(false);
 
-  function activeateChat(): void {
+  const activateChatEvent = React.useCallback(() => {
     setAutoReadEnabled(true);
-  }
+  }, []);
 
   const { filteredMessages, unreadCounts } = React.useMemo(() => {
     const filteredMessages: Record<string, Record<string, Message[]>> = {};
@@ -51,7 +51,7 @@ export function ChatPage(): React.JSX.Element {
         talker &&
         talker.login === user
       ) {
-        activeateChat();
+        activateChatEvent();
       }
 
       filteredMessages[user] = { unread, read };
@@ -100,7 +100,7 @@ export function ChatPage(): React.JSX.Element {
 
         <Chat
           talker={talker}
-          activeateChat={activeateChat}
+          activateChatEvent={activateChatEvent}
           filteredMessages={filteredMessages}
         />
       </div>
