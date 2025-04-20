@@ -24,8 +24,11 @@ export function UserList({
 
   return (
     <div className="border-b md:border-r border-gray-200 p-4 bg-gray-50 flex flex-col">
-      <h3 className="font-bold mb-2 cursor-pointer">List of users:</h3>
-      <button className="md:hidden" onClick={changeListVisability}>
+      <h3 className="font-bold mb-2">List of users:</h3>
+      <button
+        className="md:hidden cursor-pointer"
+        onClick={changeListVisability}
+      >
         {showList ? 'Hide list' : 'Show list'}{' '}
         {allUnreadMessages > 0 && (
           <span className="ml-2 inline-flex items-center justify-center rounded-full bg-blue-400 text-white text-xs w-5 h-5">
