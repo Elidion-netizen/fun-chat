@@ -22,6 +22,13 @@ export function Messages({
     }
   }, [talker, filteredMessages]);
 
+  React.useEffect(() => {
+    window.addEventListener('wheel', activateChatEvent, { once: true });
+    return (): void => {
+      window.removeEventListener('wheel', activateChatEvent);
+    };
+  }, [activateChatEvent, talker]);
+
   return (
     <div
       onClick={activateChatEvent}
