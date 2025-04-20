@@ -36,7 +36,7 @@ export function Chat({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full relative overflow-y-auto">
       {talker && (
         <div className="p-4 bg-blue-100 border-b border-blue-300 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-blue-700">
