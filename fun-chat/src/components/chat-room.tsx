@@ -62,7 +62,7 @@ export function Chat({
 
       <form
         onSubmit={sendNewMessage}
-        className="p-4 bg-gray-50 border-gray-200 border-2 flex"
+        className="p-4 bg-gray-50 border-gray-200 border-t flex"
       >
         <input
           value={chatMessage}

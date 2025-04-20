@@ -24,7 +24,7 @@ export function App(): React.JSX.Element {
   }, [connect]);
 
   return (
-    <main className="h-screen relative">
+    <main className="h-screen relative max-w-[1280px] mx-auto rounded shadow-xl">
       <Context.Provider
         value={{
           connect,
@@ -38,7 +38,7 @@ export function App(): React.JSX.Element {
         }}
       >
         <p
-          className={`absolute left-3 bottom-15 z-10 ${isConnected ? 'text-green-500' : 'text-red-500'}`}
+          className={`hidden md:block absolute left-3 bottom-15 z-10 ${isConnected ? 'text-green-500' : 'text-red-500'}`}
         >
           Conn<span className="hidden md:inline">ection</span>
         </p>

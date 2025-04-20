@@ -11,10 +11,15 @@ export function ChatPage(): React.JSX.Element {
     React.useContext(Context);
   const [talker, setTalker] = React.useState<User | null>(null);
   const [autoReadEnabled, setAutoReadEnabled] = React.useState(false);
+  const [showList, setShowList] = React.useState(false);
 
   const activateChatEvent = React.useCallback(() => {
     setAutoReadEnabled(true);
   }, []);
+
+  function changeListVisability(): void {
+    setShowList((pre) => !pre);
+  }
 
   const { filteredMessages, unreadCounts } = React.useMemo(() => {
     return filterMessages({
@@ -41,13 +46,13 @@ export function ChatPage(): React.JSX.Element {
   }
 
   return (
-    <section className="h-screen">
-      <header className="flex justify-between items-center px-5 py-2">
+    <section className="h-screen grid grid-rows-[auto_1fr_auto]">
+      <header className="flex justify-between items-center px-5 py-2 bg-blue-50/50 border-gray-200 border-b">
         <p>
-          <span className="hidden md:inline">Current user: </span>
+          <span className="hidden md:inline italic">Current user: </span>
           {currentUserRef.current?.login}
         </p>
-        <h1>FUN CHAT</h1>
+        <h1 className="font-mono font-bold tracking-wider">FUN CHAT</h1>
         <div className="flex align-middle">
           <Link to="/about" className="flex items-center">
             About
@@ -60,12 +65,16 @@ export function ChatPage(): React.JSX.Element {
           </button>
         </div>
       </header>
-      <div className="flex h-[calc(100%-7em)]">
+      <div
+        className={`${showList ? 'grid' : 'flex flex-col'} md:grid md:grid-cols-[minmax(150px,1fr)_3fr] h-full overflow-hidden`}
+      >
         <UserList
           currentUser={currentUserRef.current?.login}
           activateChat={activateChat}
           userlist={userlist}
           unreadCounts={unreadCounts}
+          showList={showList}
+          changeListVisability={changeListVisability}
         />
 
         <Chat
@@ -74,7 +83,7 @@ export function ChatPage(): React.JSX.Element {
           filteredMessages={filteredMessages}
         />
       </div>
-      <footer className="flex justify-between items-center px-5 py-2">
+      <footer className="flex justify-between items-center px-5 py-2 bg-blue-100/50 border-gray-200 border-t">
         <div className="flex items-center gap-2">
           <svg width={36} height={36} viewBox="0 0 64 64" fill="none">
             <g clip-path="url(#clip0_5701_38384)">
