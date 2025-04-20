@@ -6,6 +6,7 @@ export type WebSocketHook = {
   currentUserRef: { current: UserData | null };
   userlist: User[];
   messages: MessageState;
+  error: ErrorStore[];
 };
 
 export type SocketMessage = {
@@ -59,7 +60,7 @@ export type ResponseData = {
   };
 };
 
-export type LoginResponseError = {
+export type ErrorResponse = {
   id: string;
   type: 'ERROR';
   payload: {
@@ -150,3 +151,8 @@ export type MessageAction =
   | { type: 'UPDATE_MESSAGE'; message: DeliveryResponse }
   | { type: 'DELETE_MESSAGE'; message: DeliveryResponse }
   | { type: 'EDIT_MESSAGE'; message: EditMessage };
+
+export type ErrorStore = {
+  type: string;
+  message: string;
+};

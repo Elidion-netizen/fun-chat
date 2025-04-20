@@ -2,6 +2,7 @@ import {
   isActiveUser,
   isAllMessages,
   isAuthUsersResponse,
+  isErrorResponse,
   isMessage,
   isUser,
   isUserLoginResponse,
@@ -13,7 +14,13 @@ import {
 import { authService } from './local-storage.service';
 import { navigate } from '@/react/router';
 import { getUserMessages, getUsersList } from '@/helpers/messages';
-import type { MessageAction, SocketMessage, User, UserData } from '@/types';
+import type {
+  ErrorStore,
+  MessageAction,
+  SocketMessage,
+  User,
+  UserData,
+} from '@/types';
 
 export function messageManager(
   data: unknown,
@@ -27,14 +34,17 @@ export function messageManager(
   dispatchMessages: (action: MessageAction) => void,
   addUser: (data: User) => void,
   addUsers: (data: User[]) => void,
-  clearUsers: () => void
+  clearUsers: () => void,
+  addError: (error: ErrorStore) => void
 ): void {
   if (!validMessageResponse(data)) {
     return;
   }
   switch (data.type) {
     case 'USER_LOGIN': {
-      if (!isUserLoginResponse(data)) return;
+      if (!isUserLoginResponse(data)) {
+        return;
+      }
 
       const isLog = data.payload.user.isLogined;
       if (!isLog) return;
@@ -150,6 +160,10 @@ export function messageManager(
         clearUsers();
       }
       break;
+    }
+    case 'ERROR': {
+      if (!isErrorResponse(data)) return;
+      addError({ type: 'LOGIN', message: data.payload.error });
     }
   }
 }

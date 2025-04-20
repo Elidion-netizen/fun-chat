@@ -16,6 +16,7 @@ export function App(): React.JSX.Element {
     currentUserRef,
     userlist,
     messages,
+    error,
   } = useWebSockets();
 
   React.useEffect(() => {
@@ -33,6 +34,7 @@ export function App(): React.JSX.Element {
           currentUserRef,
           userlist,
           messages,
+          error,
         }}
       >
         <p

@@ -3,7 +3,7 @@ import React from '@/react';
 import { Link } from '@/react/router/link';
 
 export function Login(): React.JSX.Element {
-  const { sendMessage } = React.useContext(Context);
+  const { sendMessage, error } = React.useContext(Context);
 
   function login(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
@@ -45,7 +45,7 @@ export function Login(): React.JSX.Element {
             required
           />
         </div>
-        <div className="mb-6">
+        <div className="mb-6 h-24">
           <label className="block text-gray-800 font-bold" htmlFor="password">
             Password:
           </label>
@@ -54,15 +54,23 @@ export function Login(): React.JSX.Element {
             type="password"
             name="password"
             id="password"
-            minLength={3}
+            minLength={5}
             maxLength={20}
+            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{5,}"
+            title="The password must contain at least 5 characters, including at least one uppercase letter, one lowercase letter and one digit."
             placeholder="Password"
             required
           />
+          {error.length > 0 && (
+            <p className="text-red-500 text-xs">
+              {error.find((e) => e.type === 'LOGIN')?.message}
+            </p>
+          )}
         </div>
         <button
-          className="py-2 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150"
+          className="py-2 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150 disabled:bg-gray-300"
           type="submit"
+          disabled={error.length > 0}
         >
           Login
         </button>

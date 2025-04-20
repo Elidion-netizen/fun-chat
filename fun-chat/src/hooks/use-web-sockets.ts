@@ -1,7 +1,13 @@
 import { messagesReducer } from '@/helpers/reducer';
 import { authService } from '@/services/local-storage.service';
 import React from '@/react';
-import type { SocketMessage, User, UserData, WebSocketHook } from '@/types';
+import type {
+  ErrorStore,
+  SocketMessage,
+  User,
+  UserData,
+  WebSocketHook,
+} from '@/types';
 import { isAuthMessage, isGetHistoryMessage } from '@/validators';
 import { messageManager } from '@/services/message-manager.service';
 
@@ -9,6 +15,7 @@ export function useWebSockets(): WebSocketHook {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [userlist, setUserlist] = React.useState<User[]>([]);
   const [messages, dispatchMessages] = React.useReducer(messagesReducer, {});
+  const [error, setError] = React.useState<ErrorStore[]>([]);
 
   const socketRef = React.useRef<WebSocket | null>(null);
   const currentUserRef = React.useRef<UserData | null>(authService.getUser());
@@ -34,6 +41,11 @@ export function useWebSockets(): WebSocketHook {
   const clearUsers = (): void => {
     setUserlist([]);
   };
+
+  function addError(error: ErrorStore): void {
+    setError((pre) => [...pre, error]);
+    setTimeout(() => setError((pre) => pre.filter((e) => e !== error)), 2000);
+  }
 
   const connect = React.useCallback(() => {
     if (socketRef.current) return;
@@ -64,7 +76,8 @@ export function useWebSockets(): WebSocketHook {
         dispatchMessages,
         addUser,
         addUsers,
-        clearUsers
+        clearUsers,
+        addError
       );
     };
 
@@ -126,5 +139,6 @@ export function useWebSockets(): WebSocketHook {
     currentUserRef,
     userlist,
     messages,
+    error,
   };
 }

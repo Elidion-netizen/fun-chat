@@ -14,6 +14,7 @@ import type {
   UserData,
   UpdateMessage,
   EditMessageResponse,
+  ErrorResponse,
 } from './types';
 
 export function isUserLoginResponse(data: unknown): data is LoginResponse {
@@ -30,6 +31,10 @@ export function isUserLogoutResponse(data: unknown): data is LogoutResponse {
     typeof data.id === 'string' &&
     data.type === 'USER_LOGOUT'
   );
+}
+
+export function isErrorResponse(data: MessageResponse): data is ErrorResponse {
+  return 'error' in data.payload && typeof data.payload.error === 'string';
 }
 
 export function isAuthUsersResponse(data: unknown): data is AllUsers {
