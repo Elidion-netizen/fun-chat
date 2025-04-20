@@ -35,6 +35,11 @@ export function MessageElement({
     setEditedMessage(message.text);
   }
 
+  function deleteEvent(id: string): void {
+    setIsEdit(false);
+    deleteMessage(sendMessage, id);
+  }
+
   return (
     <div
       key={message.id}
@@ -144,7 +149,7 @@ export function MessageElement({
           </button>
           <button
             className="text-red-400 bg-blue-300/50 px-2 py-1 rounded hover:bg-blue-400/70 duration-300 ease-in-out"
-            onClick={() => deleteMessage(sendMessage, message.id)}
+            onClick={() => deleteEvent(message.id)}
           >
             Delete
           </button>
