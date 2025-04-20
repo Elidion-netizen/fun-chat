@@ -73,7 +73,7 @@ export function Chat({
         />
         <button
           type="submit"
-          className="inline-flex ml-4 justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600 rotate-90 transition-colors duration-500 ease-in-out"
+          className="inline-flex ml-4 justify-center p-2 text-blue-600 rounded-full not-disabled:cursor-pointer not-disabled:hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600 rotate-90 transition-colors duration-500 ease-in-out"
           disabled={!talker || chatMessage.length === 0}
         >
           <svg width={24} height={24} fill="currentColor" viewBox="0 0 20 20">

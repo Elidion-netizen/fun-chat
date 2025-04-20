@@ -27,9 +27,10 @@ export function Login(): React.JSX.Element {
   return (
     <section className="h-screen flex items-center justify-center bg-gray-100">
       <form
-        className="max-w-xl py-6 px-8 h-84 bg-white rounded shadow-xl"
+        className="max-w-xl py-6 px-8 h-94 bg-white rounded shadow-xl"
         onSubmit={login}
       >
+        <h2 className="text-center font-bold mb-1">Authorization</h2>
         <div className="mb-6">
           <label className="block text-gray-800 font-bold" htmlFor="login">
             Login:

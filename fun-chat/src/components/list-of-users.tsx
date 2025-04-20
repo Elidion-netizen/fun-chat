@@ -16,7 +16,9 @@ export function UserList({
 
   return (
     <div className="w-1/4 bg-gray-50 p-4 border-gray-200 border-2">
-      <h3 className="font-bold mb-2">List of users</h3>
+      <h3 className="font-bold mb-2">
+        List<span className="hidden md:inline"> of users</span>:
+      </h3>
       <input
         className="mb-2 p-1 border w-full rounded"
         type="text"

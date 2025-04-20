@@ -40,7 +40,7 @@ export function App(): React.JSX.Element {
         <p
           className={`absolute left-3 bottom-15 z-10 ${isConnected ? 'text-green-500' : 'text-red-500'}`}
         >
-          Connection
+          Conn<span className="hidden md:inline">ection</span>
         </p>
         <Router routes={routes} fallback={<NotFound />} />
       </Context.Provider>
