@@ -156,3 +156,8 @@ export type ErrorStore = {
   type: string;
   message: string;
 };
+
+export type ControlsProps = {
+  id: string;
+  status: boolean;
+};

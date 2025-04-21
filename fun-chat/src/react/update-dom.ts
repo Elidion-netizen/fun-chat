@@ -40,7 +40,7 @@ export const updateDOM = (
         addPropValue
       ) {
         for (const [name, value] of Object.entries(addPropValue)) {
-          if ('style' in DOM && DOM instanceof HTMLElement) {
+          if (DOM instanceof HTMLElement) {
             Object.assign(DOM.style, { [name]: String(value) });
           }
         }

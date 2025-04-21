@@ -1,25 +1,76 @@
 import { Context } from '@/app';
 import { deleteMessage, sendEditedMessage } from '@/helpers/messages';
 import React from '@/react';
-import type { Message, SocketMessage } from '@/types';
+import type { ControlsProps, Message, SocketMessage } from '@/types';
 
 export function MessageElement({
   message,
+  hasControls,
+  changeControlsStatus,
 }: {
   message: Message;
+  hasControls: ControlsProps;
+  changeControlsStatus: (status: boolean, id?: string) => void;
 }): React.JSX.Element {
   const { currentUserRef, sendMessage } = React.useContext(Context);
-  const [hasControls, setHasControls] = React.useState(false);
+
   const [isEdit, setIsEdit] = React.useState(false);
   const [editedMessage, setEditedMessage] = React.useState(message.text);
+  const [contextMenu, setContextMenu] = React.useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const messageRef = React.useRef<HTMLDivElement>(null);
+  const menuRef = React.useRef<HTMLDivElement>(null);
 
   function messageMenu(
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    name: string
+    name: string,
+    id: string
   ): void {
     e.preventDefault();
-    if (currentUserRef.current?.login === name) setHasControls((pre) => !pre);
+    if (currentUserRef.current?.login === name) {
+      if (hasControls.id === id) {
+        changeControlsStatus(false);
+      } else {
+        changeControlsStatus(true, id);
+      }
+    }
+    if (messageRef.current) {
+      const chatRect = messageRef.current.getBoundingClientRect();
+      const clickX = e.clientX - chatRect.left;
+      const clickY = e.clientY - chatRect.top;
+      setContextMenu({ x: clickX, y: clickY });
+    }
   }
+
+  React.useLayoutEffect(() => {
+    const message = messageRef.current;
+    const menu = menuRef.current;
+    if (contextMenu && menu && message) {
+      requestAnimationFrame(() => {
+        const chatRect = message.getBoundingClientRect();
+        const menuRect = menu.getBoundingClientRect();
+
+        let correctedX = contextMenu.x;
+        let correctedY = contextMenu.y;
+
+        if (contextMenu.x + menuRect.width > chatRect.width) {
+          correctedX = chatRect.width - menuRect.width;
+        }
+        if (contextMenu.y + menuRect.height > chatRect.height) {
+          correctedY = chatRect.height - menuRect.height;
+        }
+
+        if (correctedX !== contextMenu.x || correctedY !== contextMenu.y) {
+          setContextMenu((prev) =>
+            prev ? { ...prev, x: correctedX, y: correctedY } : null
+          );
+        }
+      });
+    }
+  }, [contextMenu]);
 
   function confirmEdit(
     sendMessage: (message: SocketMessage) => void,
@@ -30,20 +81,26 @@ export function MessageElement({
     setIsEdit(false);
   }
 
-  function cancelEdit(): void {
-    setIsEdit(false);
+  function editMessage(): void {
+    setIsEdit(true);
+    changeControlsStatus(false);
     setEditedMessage(message.text);
   }
 
-  function deleteEvent(id: string): void {
+  function cancelEdit(): void {
     setIsEdit(false);
+    setEditedMessage('');
+  }
+
+  function deleteEvent(id: string): void {
+    changeControlsStatus(false);
     deleteMessage(sendMessage, id);
   }
 
   return (
     <div
       key={message.id}
-      onContextMenu={(e) => messageMenu(e, message.from)}
+      onContextMenu={(e) => messageMenu(e, message.from, message.id)}
       className={`flex ${
         message.from === currentUserRef.current?.login
           ? 'justify-end'
@@ -56,6 +113,7 @@ export function MessageElement({
             ? 'bg-blue-500 text-white'
             : 'bg-gray-200 text-black'
         }`}
+        ref={messageRef}
       >
         <div className="flex items-center justify-between mb-2 text-sm">
           <div className="flex items-center gap-2">
@@ -138,23 +196,39 @@ export function MessageElement({
             )
           )}
         </div>
+        {!isEdit && hasControls.id === message.id && (
+          <div
+            className="flex gap-2 bg-white/70 px-3 py-2 rounded-2xl"
+            style={{
+              position: 'absolute',
+              top: `${contextMenu?.y}px`,
+              left: `${contextMenu?.x}px`,
+            }}
+            ref={menuRef}
+          >
+            <button
+              className="text-green-400 bg-blue-400/70 px-2 py-1 rounded hover:bg-blue-500/70 duration-300 ease-in-out cursor-pointer"
+              onClick={editMessage}
+              style={{
+                textShadow:
+                  '1px 1px 0 #666666, -1px 1px 0 #666666, 1px -1px 0 #666666, -1px -1px 0 #666666',
+              }}
+            >
+              Edit
+            </button>
+            <button
+              className="text-red-400 bg-blue-400/70 px-2 py-1 rounded hover:bg-blue-500/70 duration-300 ease-in-out cursor-pointer"
+              onClick={() => deleteEvent(message.id)}
+              style={{
+                textShadow:
+                  '1px 1px 0 #666666, -1px 1px 0 #666666, 1px -1px 0 #666666, -1px -1px 0 #666666',
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
       </div>
-      {!isEdit && hasControls && (
-        <div className="absolute -right-2 -bottom-2 flex gap-2">
-          <button
-            className="text-green-400 bg-blue-300/50 px-2 py-1 rounded hover:bg-blue-400/70 duration-300 ease-in-out"
-            onClick={() => setIsEdit(true)}
-          >
-            Edit
-          </button>
-          <button
-            className="text-red-400 bg-blue-300/50 px-2 py-1 rounded hover:bg-blue-400/70 duration-300 ease-in-out"
-            onClick={() => deleteEvent(message.id)}
-          >
-            Delete
-          </button>
-        </div>
-      )}
     </div>
   );
 }

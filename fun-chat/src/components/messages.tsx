@@ -1,5 +1,5 @@
 import React from '@/react';
-import type { Message, User } from '@/types';
+import type { ControlsProps, Message, User } from '@/types';
 import { MessageElement } from './message';
 
 export function Messages({
@@ -12,6 +12,10 @@ export function Messages({
   activateChatEvent: () => void;
 }): React.JSX.Element {
   const separatorRef = React.useRef<HTMLBRElement | null>(null);
+  const [hasControls, setHasControls] = React.useState<ControlsProps>({
+    id: '',
+    status: false,
+  });
 
   React.useEffect(() => {
     if (separatorRef.current) {
@@ -29,6 +33,10 @@ export function Messages({
     };
   }, [activateChatEvent, talker]);
 
+  function changeControlsStatus(status: boolean, id: string = ''): void {
+    setHasControls({ id, status });
+  }
+
   return (
     <div
       onClick={activateChatEvent}
@@ -39,7 +47,11 @@ export function Messages({
           <div>
             {filteredMessages[talker.login].read.length > 0 &&
               filteredMessages[talker.login].read.map((el) => (
-                <MessageElement message={el} />
+                <MessageElement
+                  message={el}
+                  hasControls={hasControls}
+                  changeControlsStatus={changeControlsStatus}
+                />
               ))}
           </div>
           <br ref={separatorRef}></br>
@@ -57,7 +69,11 @@ export function Messages({
           <>
             {filteredMessages[talker.login].unread.length > 0 &&
               filteredMessages[talker.login].unread.map((el) => (
-                <MessageElement message={el} />
+                <MessageElement
+                  message={el}
+                  hasControls={hasControls}
+                  changeControlsStatus={changeControlsStatus}
+                />
               ))}
           </>
         </>

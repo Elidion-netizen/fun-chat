@@ -69,7 +69,7 @@ export function Login(): React.JSX.Element {
           )}
         </div>
         <button
-          className="py-2 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150 disabled:bg-gray-300"
+          className="py-2 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded hover:bg-indigo-600 transition-colors delay-150 disabled:bg-gray-300 cursor-pointer"
           type="submit"
           disabled={error.length > 0}
         >
