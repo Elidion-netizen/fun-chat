@@ -100,8 +100,7 @@ export function MessageElement({
   return (
     <div
       key={message.id}
-      onContextMenu={(e) => messageMenu(e, message.from, message.id)}
-      className={`flex ${
+      className={`flex overflow-hidden ${
         message.from === currentUserRef.current?.login
           ? 'justify-end'
           : 'justify-start'
@@ -110,10 +109,11 @@ export function MessageElement({
       <div
         className={`relative max-w-xs rounded-lg px-3 pt-3 pb-6 shadow-md ${
           message.from === currentUserRef.current?.login
-            ? 'bg-blue-500 text-white'
+            ? 'bg-blue-500 text-white cursor-pointer'
             : 'bg-gray-200 text-black'
         }`}
         ref={messageRef}
+        onContextMenu={(e) => messageMenu(e, message.from, message.id)}
       >
         <div className="flex items-center justify-between mb-2 text-sm">
           <div className="flex items-center gap-2">
