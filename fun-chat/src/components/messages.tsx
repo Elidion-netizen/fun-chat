@@ -42,41 +42,50 @@ export function Messages({
       onClick={activateChatEvent}
       className="flex-1 p-4 overflow-y-auto bg-white"
     >
-      {talker !== null && `${talker.login}` in filteredMessages && (
-        <>
+      {talker !== null && `${talker.login}` in filteredMessages ? (
+        filteredMessages[talker.login].read.length === 0 &&
+        filteredMessages[talker.login].unread.length === 0 ? (
+          <p className="text-center">You don't have a message history yet</p>
+        ) : (
           <div>
-            {filteredMessages[talker.login].read.length > 0 &&
-              filteredMessages[talker.login].read.map((el) => (
-                <MessageElement
-                  message={el}
-                  hasControls={hasControls}
-                  changeControlsStatus={changeControlsStatus}
-                />
-              ))}
+            <div>
+              {filteredMessages[talker.login].read.length > 0 &&
+                filteredMessages[talker.login].read.map((el) => (
+                  <MessageElement
+                    message={el}
+                    hasControls={hasControls}
+                    changeControlsStatus={changeControlsStatus}
+                  />
+                ))}
+            </div>
+            <br ref={separatorRef}></br>
+            <div>
+              {filteredMessages[talker.login].unread.length > 0 && (
+                <div className="relative my-6 flex items-center">
+                  <div className="flex-grow border-t border-gray-300"></div>
+                  <span className="mx-4 text-gray-500 text-sm font-medium">
+                    New Messages
+                  </span>
+                  <div className="flex-grow border-t border-gray-300"></div>
+                </div>
+              )}
+            </div>
+            <>
+              {filteredMessages[talker.login].unread.length > 0 &&
+                filteredMessages[talker.login].unread.map((el) => (
+                  <MessageElement
+                    message={el}
+                    hasControls={hasControls}
+                    changeControlsStatus={changeControlsStatus}
+                  />
+                ))}
+            </>
           </div>
-          <br ref={separatorRef}></br>
-          <div>
-            {filteredMessages[talker.login].unread.length > 0 && (
-              <div className="relative my-6 flex items-center">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <span className="mx-4 text-gray-500 text-sm font-medium">
-                  New Messages
-                </span>
-                <div className="flex-grow border-t border-gray-300"></div>
-              </div>
-            )}
-          </div>
-          <>
-            {filteredMessages[talker.login].unread.length > 0 &&
-              filteredMessages[talker.login].unread.map((el) => (
-                <MessageElement
-                  message={el}
-                  hasControls={hasControls}
-                  changeControlsStatus={changeControlsStatus}
-                />
-              ))}
-          </>
-        </>
+        )
+      ) : (
+        <p className="text-center">
+          to start a dialogue, you need to select an user in userlist
+        </p>
       )}
     </div>
   );
