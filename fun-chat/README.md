@@ -10,10 +10,11 @@ To view [deploy](https://elidion-netizen-fun-chat.netlify.app/) you need run ser
 - [x] unit of work render
 - [x] functional components and hooks
 - [x] own routing with guards
+- [x] svg support
 
 ### Not implemented:
 
-- [] diffs algorithm
+- [ ] diffs algorithm
 
 To install dependencies:
 
