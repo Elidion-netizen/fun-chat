@@ -19,6 +19,10 @@ export function App(): React.JSX.Element {
     error,
   } = useWebSockets();
 
+  React.useEffect(() => {
+    connect();
+  }, [connect]);
+
   return (
     <main className="h-screen relative max-w-[1280px] mx-auto rounded shadow-xl">
       <Context.Provider
